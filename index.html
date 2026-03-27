@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Holiday Distance Tracker</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+</head>
+<body>
+
+  <header>
+    <div class="logo">&#9992;&#65039; Holiday Distance Tracker</div>
+    <p class="tagline">The more emails you get, the further you should escape</p>
+  </header>
+
+  <main>
+
+    <!-- Setup Panel -->
+    <section class="panel setup-panel" id="setupPanel">
+      <h2>Your Home Base</h2>
+      <div class="input-row">
+        <input
+          type="text"
+          id="homeInput"
+          placeholder="Enter your city, e.g. London, UK"
+          autocomplete="off"
+        />
+        <button id="setHomeBtn">Set Home</button>
+      </div>
+      <div id="homeStatus" class="status-msg"></div>
+
+      <div class="ooo-row">
+        <label class="toggle-label">
+          <span>Out of Office</span>
+          <button id="oooToggle" class="ooo-btn" disabled>
+            <span id="oooIcon">&#128717;</span>
+            <span id="oooText">Enable OOO</span>
+          </button>
+        </label>
+      </div>
+    </section>
+
+    <!-- Email Counter Panel -->
+    <section class="panel email-panel" id="emailPanel" aria-hidden="true">
+      <h2>Incoming Emails</h2>
+      <p class="panel-desc">Each email while you're out nudges your dream destination further away.</p>
+
+      <div class="email-counter-wrap">
+        <button id="emailMinusBtn" class="counter-btn minus">&#8722;</button>
+        <div class="email-display">
+          <span id="emailCount">0</span>
+          <span class="email-label">emails</span>
+        </div>
+        <button id="emailPlusBtn" class="counter-btn plus">+</button>
+      </div>
+
+      <button id="simulateBtn" class="simulate-btn">&#9654; Simulate Incoming Emails</button>
+      <button id="stopSimBtn" class="simulate-btn stop hidden">&#9646;&#9646; Stop</button>
+
+      <div class="distance-banner" id="distanceBanner">
+        <span class="dist-label">Current escape radius</span>
+        <span class="dist-value" id="distanceValue">— km</span>
+      </div>
+    </section>
+
+    <!-- Map -->
+    <section class="panel map-panel" id="mapPanel" aria-hidden="true">
+      <h2>Your Escape Destinations</h2>
+      <div id="map"></div>
+    </section>
+
+    <!-- Destination Cards -->
+    <section class="panel cards-panel" id="cardsPanel" aria-hidden="true">
+      <h2>Top Picks at This Distance</h2>
+      <div id="destinationCards" class="cards-grid"></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <p>Destinations sourced from a curated world list. Distances are as the crow flies.</p>
+  </footer>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
