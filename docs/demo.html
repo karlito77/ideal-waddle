@@ -1,0 +1,390 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riskintel Community Demo</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --page:#f3f5f8; --card:#ffffff; --card-2:#f7f9fb; --ink:#111519; --ink-2:#4b545e; --muted:#7a838d;
+  --grid:#e4e8ed; --axis:#c5ccd4; --line:rgba(17,21,25,.10); --accent:#1c5cab; --accent-wash:rgba(28,92,171,.08);
+  --s1:#2a78d6; --s2:#eb6834; --s3:#1baf7a; --seq-lo:#cde2fb;
+  --good:#0ca30c; --warn:#fab219; --serious:#ec835a; --critical:#d03b3b; --good-text:#006300;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --page:#0e1114; --card:#171b20; --card-2:#1d2228; --ink:#f2f4f6; --ink-2:#b4bcc6; --muted:#838c96;
+    --grid:#2a3037; --axis:#3a424b; --line:rgba(255,255,255,.10); --accent:#5598e7; --accent-wash:rgba(85,152,231,.12);
+    --s1:#3987e5; --s2:#d95926; --s3:#199e70; --seq-lo:#184f95; --good-text:#0ca30c;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0e1114; --card:#171b20; --card-2:#1d2228; --ink:#f2f4f6; --ink-2:#b4bcc6; --muted:#838c96;
+  --grid:#2a3037; --axis:#3a424b; --line:rgba(255,255,255,.10); --accent:#5598e7; --accent-wash:rgba(85,152,231,.12);
+  --s1:#3987e5; --s2:#d95926; --s3:#199e70; --seq-lo:#184f95; --good-text:#0ca30c;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-block:0 48px;padding-inline:16px}
+h1,h2,h3{margin:0;text-wrap:balance;font-weight:600}
+h1{font-size:20px} h2{font-size:17px} h3{font-size:14px}
+p{margin:0}
+.eyebrow{font:500 11px/1.2 var(--mono);letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.mono{font-family:var(--mono);font-size:12px}
+.num{font-variant-numeric:tabular-nums}
+
+/* top bar */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--page);border-bottom:1px solid var(--line);padding-block:12px;margin-bottom:24px}
+.top-in{display:flex;flex-wrap:wrap;align-items:center;gap:12px 24px}
+.brand{display:flex;align-items:center;gap:10px}
+.brand .mark{width:26px;height:26px;border-radius:7px;background:var(--accent);display:grid;place-items:center}
+.brand .mark svg{width:16px;height:16px}
+.brand small{display:block;color:var(--muted);font-size:12px;line-height:1.2}
+.seg{display:flex;gap:2px;background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:2px;margin-left:auto}
+.seg button{border:0;background:transparent;color:var(--ink-2);font:500 13px var(--sans);padding:6px 12px;border-radius:6px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.seg button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+/* stepper */
+.steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:28px}
+.step{display:block;text-decoration:none;color:var(--ink-2);padding:8px 0 8px;border-top:2px solid var(--axis);font-size:12px}
+.step b{display:block;color:var(--ink);font-weight:600;font-size:13px}
+.step:hover{border-top-color:var(--accent)}
+@media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
+
+/* sections */
+section{margin-bottom:36px;scroll-margin-top:72px}
+.sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:12px}
+.sec-head p{color:var(--ink-2);max-width:68ch}
+.grid{display:grid;gap:14px}
+.g2{grid-template-columns:1fr 1fr} .g3{grid-template-columns:repeat(3,1fr)} .g4{grid-template-columns:repeat(4,1fr)}
+.g21{grid-template-columns:2fr 1fr} .g12{grid-template-columns:1fr 2fr}
+@media (max-width:820px){.g2,.g3,.g4,.g21,.g12{grid-template-columns:1fr 1fr}}
+@media (max-width:560px){.g2,.g3,.g4,.g21,.g12{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:14px 16px;min-width:0}
+.card h3{margin-bottom:2px}
+.card .sub{color:var(--muted);font-size:12px;margin-bottom:10px}
+.tile .eyebrow{margin-bottom:6px}
+.tile .v{font-size:26px;font-weight:600;line-height:1.1}
+.tile .d{color:var(--ink-2);font-size:12px;margin-top:4px}
+.hero{background:var(--accent-wash);border-color:transparent}
+.hero .v{font-size:48px;color:var(--accent)}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:5px;padding:1px 8px;border-radius:999px;font-size:11.5px;font-weight:500;border:1px solid var(--line);background:var(--card-2);color:var(--ink-2);white-space:nowrap}
+.chip i{width:7px;height:7px;border-radius:50%;background:var(--muted);flex:none}
+.chip.low i{background:var(--good)} .chip.medium i{background:var(--warn)} .chip.high i{background:var(--serious)} .chip.critical i{background:var(--critical)}
+.chip.ok{color:var(--good-text)} .chip.ok i{background:var(--good)}
+.chip.no{color:var(--critical)} .chip.no i{background:var(--critical)}
+.chip.src{font-family:var(--mono);font-weight:400}
+
+/* lists & tables */
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column}
+.list li{display:flex;gap:10px;align-items:flex-start;padding:8px 0;border-top:1px solid var(--grid)}
+.list li:first-child{border-top:0;padding-top:0}
+.list .t{flex:1;min-width:0}
+.list .t small{display:block;color:var(--muted);font-size:12px}
+.tbl-wrap{overflow-x:auto}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{text-align:left;font-weight:500;color:var(--muted);font-size:11.5px;letter-spacing:.04em;text-transform:uppercase;padding:6px 10px 6px 0;border-bottom:1px solid var(--axis);white-space:nowrap}
+td{padding:8px 10px 8px 0;border-bottom:1px solid var(--grid);vertical-align:top}
+td.r,th.r{text-align:right;font-variant-numeric:tabular-nums}
+tr.rec td{background:var(--accent-wash)}
+tr.rec td:first-child{border-left:3px solid var(--accent);padding-left:8px}
+tr.rej td{color:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;color:var(--ink-2);margin-top:8px}
+.legend span{display:inline-flex;align-items:center;gap:6px}
+.legend i{width:10px;height:10px;border-radius:2px;display:inline-block}
+
+/* charts */
+.chart{width:100%;height:auto;display:block;overflow:visible}
+.chart text{font-family:var(--sans);font-size:11px;fill:var(--muted)}
+.chart .lab{fill:var(--ink-2);font-size:11px}
+.chart .grid line{stroke:var(--grid);stroke-width:1}
+.chart .axis{stroke:var(--axis);stroke-width:1}
+.chart .bar{rx:0}
+.chart .hit{fill:transparent}
+.chart .ref{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:3 3}
+.chart .thr{stroke:var(--serious);stroke-width:1}
+.chart .thr2{stroke:var(--critical);stroke-width:1}
+.tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--page);font-size:12px;padding:6px 9px;border-radius:6px;z-index:20;opacity:0;transition:opacity .08s;max-width:260px}
+.tip b{display:block;font-weight:600}
+.meter{height:8px;border-radius:4px;background:var(--seq-lo);overflow:hidden;margin-top:8px}
+.meter i{display:block;height:100%;background:var(--accent)}
+.consent{display:grid;grid-template-columns:auto 1fr;gap:4px 12px;font-size:13px}
+.consent dt{color:var(--muted)}
+.consent dd{margin:0}
+.reasons{margin:0;padding-left:18px;color:var(--ink-2)}
+.reasons li{margin-bottom:4px}
+.foot{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px;max-width:80ch}
+@media (prefers-reduced-motion:reduce){.tip{transition:none}}
+</style>
+</head>
+<body>
+
+<div class="top"><div class="wrap top-in">
+  <div class="brand">
+    <div class="mark"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M2 12 L6 7 L9 10 L14 3"/><path d="M2 14h12"/></svg></div>
+    <div><h1>Risk Intelligence Platform</h1><small>Community demo · Logistics &amp; Warehousing</small></div>
+  </div>
+  <div class="seg" role="group" aria-label="Viewing as client" id="client-seg"></div>
+</div></div>
+
+<div class="wrap">
+  <nav class="steps" aria-label="Pipeline">
+    <a class="step" href="#ingest"><b>Ingest</b>losses, issues, IoT</a>
+    <a class="step" href="#exchange"><b>Exchange</b>consent &amp; peers</a>
+    <a class="step" href="#benchmark"><b>Benchmark</b>own vs pool</a>
+    <a class="step" href="#model"><b>Model</b>frequency × severity</a>
+    <a class="step" href="#simulate"><b>Simulate</b>aggregate loss</a>
+    <a class="step" href="#decide"><b>Decide</b>retention</a>
+  </nav>
+
+  <section id="profile">
+    <div class="sec-head"><h2 id="client-name"></h2><p id="client-meta" class="mono"></p></div>
+    <div class="grid g4" id="tiles"></div>
+  </section>
+
+  <section id="ingest">
+    <div class="sec-head"><h2>1 · Ingest</h2><p>Loss runs, the risk register and device telemetry land in one shape. Amounts are trended to 2025 money at 4% a year.</p></div>
+    <div class="grid g2">
+      <div class="card"><h3>Trended incurred by year</h3><div class="sub">All lines, 2025 money</div><div id="c-year"></div></div>
+      <div class="card"><h3>Incurred by cause of loss</h3><div class="sub">Mapped from free text to the platform taxonomy</div><div id="c-cause"></div></div>
+      <div class="card"><h3>Risk register</h3><div class="sub">Own, assessor and IoT-raised issues, ranked by severity × likelihood</div><ul class="list" id="issues"></ul></div>
+      <div class="card"><h3>IoT telemetry</h3><div class="sub" id="iot-sub"></div><div id="c-iot"></div><ul class="list" id="alerts"></ul></div>
+    </div>
+  </section>
+
+  <section id="exchange">
+    <div class="sec-head"><h2>2 · Exchange</h2><p>Sharing is opt-in and the data owner decides. Each peer's consent is checked before any record leaves their boundary, then their chosen anonymisation is applied.</p></div>
+    <div class="grid g3" id="consents"></div>
+    <div class="grid g21" style="margin-top:14px">
+      <div class="card"><h3 id="peers-title"></h3><div class="sub">Cohort score = 45% activity-code match + 35% same region + 20% size similarity. Peers below 0.40 are excluded.</div><div class="tbl-wrap"><table id="peers"></table></div></div>
+      <div class="card"><h3>Peer issues shared in</h3><div class="sub">Learn from what neighbours found; adopt into the own register</div><ul class="list" id="shared-issues"></ul></div>
+    </div>
+  </section>
+
+  <section id="benchmark">
+    <div class="sec-head"><h2>3 · Benchmark</h2><p>Own experience against the pooled cohort, blended with limited-fluctuation credibility Z = n / (n + 25).</p></div>
+    <div class="grid g3" id="bench"></div>
+  </section>
+
+  <section id="model">
+    <div class="sec-head"><h2>4 · Model</h2><p>Poisson frequency, lognormal severity. Open risk issues load frequency by category; live IoT monitoring earns a credit.</p></div>
+    <div class="grid g3" id="model-cards"></div>
+  </section>
+
+  <section id="simulate">
+    <div class="sec-head"><h2>5 · Simulate</h2><p>20,000 Monte Carlo years of ground-up losses, seed 42, so every figure below is reproducible.</p></div>
+    <div class="grid g21">
+      <div class="card"><h3>Aggregate annual loss distribution</h3><div class="sub">Share of simulated years by total loss; top 0.5% trimmed from the axis</div><div id="c-hist"></div></div>
+      <div class="card"><h3>Percentiles</h3><div class="sub">Total loss in a year at each return period</div><div class="tbl-wrap"><table id="pct"></table></div></div>
+    </div>
+  </section>
+
+  <section id="decide">
+    <div class="sec-head"><h2>6 · Decide</h2><p>Every candidate self-insured retention is costed on the same simulated years. The recommendation is the cheapest option that stays inside the client's risk appetite.</p></div>
+    <div class="grid g12">
+      <div class="grid" style="grid-template-columns:1fr;align-content:start">
+        <div class="card tile hero"><div class="eyebrow">Recommended per-occurrence SIR</div><div class="v num" id="rec-sir"></div><div class="d" id="rec-sub"></div></div>
+        <div class="card"><h3>Why</h3><ul class="reasons" id="reasons"></ul></div>
+      </div>
+      <div class="card"><h3>Total cost of risk by retention</h3><div class="sub">Expected retained + premium indication (1.35 × expected ceded) + volatility charge (½ × P95 − mean of retained)</div><div id="c-tcor"></div><div class="legend"><span><i style="background:var(--s1)"></i>Expected retained</span><span><i style="background:var(--s2)"></i>Premium indication</span><span><i style="background:var(--s3)"></i>Volatility charge</span></div></div>
+    </div>
+    <div class="card" style="margin-top:14px"><h3>Options table</h3><div class="sub" id="opt-sub"></div><div class="tbl-wrap"><table id="options"></table></div></div>
+  </section>
+
+  <p class="foot">Demo data: three synthetic clients seeded by <span class="mono">riskintel.demo</span>. Every number on this page was produced by running the platform's own pipeline (ingestion → exchange → benchmark → fit → 20,000-trial simulation → SIR decision); nothing is hand-typed. Pseudonyms are SHA-256 tokens of the client id, which is what a peer sees when a client shares at record level.</p>
+</div>
+<div class="tip" id="tip" role="status" aria-live="polite"></div>
+
+<script>
+const DATA = {"northwind":{"name":"Northwind Logistics","activity_code":"4931","revenue":120000000.0,"regions":["Yorkshire"],"locations":["Leeds DC","Sheffield Hub"],"consents":[{"scope":"loss_history","audience":"cohort_activity","anon":"pseudonymised"},{"scope":"risk_issues","audience":"community","anon":"pseudonymised"}],"experience":{"claims":31,"years":[2021,2022,2023,2024,2025],"total":490494.72061471327,"freq":0.04874213836477988,"mean":15822.410342410105,"median":9645.581747296083,"p90":23514.495251146913,"max":102256.85190762408,"by_cause":{"weather":42000.74752038675,"crime":50731.79827989254,"water":108559.7547164966,"auto.collision":125137.85000856544,"fire":112312.58069377785,"liability.slip_trip":51751.98939559411},"by_year":{"2021":57311.479334025156,"2022":81489.16290747604,"2023":111434.09758671843,"2024":190917.032455692,"2025":49342.94833080168}},"peers":[{"id":"contoso","name":"Contoso Distribution","score":0.975,"location":true,"activity_depth":4,"size_ratio":0.75,"included":true},{"id":"fabrikam","name":"Fabrikam Freight","score":0.268,"location":false,"activity_depth":1,"size_ratio":1.67,"included":false}],"pool":{"claims":30,"tokens":["aggregated"],"banded":true},"benchmark":{"own_frequency":0.04874213836477988,"pool_frequency":0.06289308176100629,"own_mean_severity":15822.410342410105,"pool_mean_severity":13866.666666666666,"pool_claim_count":30,"pool_members":1,"credibility":0.554,"blended_frequency":0.05505952380952381,"blended_mean_severity":14949.310487167499,"top_pool_causes":[["water",97500.0],["liability.slip_trip",81500.0],["weather",73000.0],["fire",70000.0],["crime",58000.0]]},"shared_issues":[{"owner_token":"d7d561e6eb09","origin_issue_id":"40d902f4641542a0b894be13ed17c7c7","category":"fire.protection","title":"Sprinkler impairment during roof works","severity":"critical","likelihood":0.3}],"issues":[{"title":"Hot work permits not enforced","category":"fire.hot_work","severity":"high","likelihood":0.4,"source":"own","score":1.2000000000000002},{"title":"Forklift pedestrian segregation missing","category":"injury.vehicle","severity":"medium","likelihood":0.5,"source":"own","score":1.0}],"alerts":[{"metric":"water_flow_lpm","value":25.0,"severity":"high","device":"flow-01","at":"2025-12-01T10:00:00"},{"metric":"water_flow_lpm","value":30.0,"severity":"high","device":"flow-01","at":"2025-12-01T11:00:00"},{"metric":"water_flow_lpm","value":70.0,"severity":"critical","device":"flow-01","at":"2025-12-01T12:00:00"}],"signals":[{"metric":"water_flow_lpm","value":5.0,"at":"2025-12-01T08:00:00"},{"metric":"water_flow_lpm","value":8.0,"at":"2025-12-01T09:00:00"},{"metric":"water_flow_lpm","value":25.0,"at":"2025-12-01T10:00:00"},{"metric":"water_flow_lpm","value":30.0,"at":"2025-12-01T11:00:00"},{"metric":"water_flow_lpm","value":70.0,"at":"2025-12-01T12:00:00"},{"metric":"water_flow_lpm","value":12.0,"at":"2025-12-01T13:00:00"}],"model":{"freq":7.003571428571429,"modifier":1.1337,"notes":["+15% open fire issue","+6% open injury issue","-7% IoT monitoring on water"],"mu":9.227106903442206,"sigma":0.8778536928820309,"exp_sev":14949.310487167499,"eal":118696.7617854672,"basis":"credibility 0.55 own / 0.45 pool"},"sim":{"trials":20000,"mean":118994.75821675318,"p50":108800.96380948668,"p75":152592.20415888517,"p90":201503.5951352785,"p95":234867.27981699532,"p99":308770.30129043513,"max":695795.4489734841,"hist":{"counts":[46,100,267,398,578,761,948,1060,1181,1255,1221,1217,1215,1134,1076,948,872,768,700,608,535,460,423,332,297,254,224,181,140,134,112,100,89,67,48,39,35,33,28,116],"max":340352.3529584684}},"appetite":250000.0,"decision":{"recommended":25000,"reasons":["lowest total cost of risk among feasible options (162,685)","expected retained 96,889, premium indication 29,843","1-in-100 retained 204,522 within appetite 250,000"],"rejected":{"50000":"1-in-100 retained 257,991 exceeds appetite 250,000","100000":"1-in-100 retained 290,296 exceeds appetite 250,000","250000":"1-in-100 retained 308,678 exceeds appetite 250,000","500000":"1-in-100 retained 308,770 exceeds appetite 250,000"},"options":[{"sir":25000,"aggregate_cap":null,"expected_retained":96888.8749588102,"retained_p90":151241.54240501227,"retained_p95":168796.1414329881,"retained_p99":204522.25370369328,"expected_ceded":22105.883257943933,"premium_indication":29842.942398224313,"total_cost_of_risk":162685.45059412345,"volatility_charge":35953.63323708896},{"sir":50000,"aggregate_cap":null,"expected_retained":112216.07333228238,"retained_p90":182901.4154910535,"retained_p95":208136.99592356844,"retained_p99":257991.4591875939,"expected_ceded":6778.684884471553,"premium_indication":9151.224594036597,"total_cost_of_risk":169327.759221962,"volatility_charge":47960.46129564303},{"sir":100000,"aggregate_cap":null,"expected_retained":117741.21049153974,"retained_p90":198026.69358391408,"retained_p95":227763.8377119445,"retained_p99":290296.49140368943,"expected_ceded":1253.547725213611,"premium_indication":1692.2894290383751,"total_cost_of_risk":174444.8135307805,"volatility_charge":55011.313610202385},{"sir":250000,"aggregate_cap":null,"expected_retained":118949.9459963557,"retained_p90":201503.5951352785,"retained_p95":234867.27981699532,"retained_p99":308678.199678807,"expected_ceded":44.8122203974659,"premium_indication":60.49649753657897,"total_cost_of_risk":176969.1094042121,"volatility_charge":57958.66691031981},{"sir":500000,"aggregate_cap":null,"expected_retained":118992.82765918084,"retained_p90":201503.5951352785,"retained_p95":234867.27981699532,"retained_p99":308770.30129043513,"expected_ceded":1.9305575723405228,"premium_indication":2.606252722659706,"total_cost_of_risk":176932.65999081073,"volatility_charge":57937.22607890724}]}},"contoso":{"name":"Contoso Distribution","activity_code":"4931","revenue":90000000.0,"regions":["Yorkshire"],"locations":["Wakefield DC"],"consents":[{"scope":"loss_history","audience":"community","anon":"aggregated"},{"scope":"risk_issues","audience":"cohort_location","anon":"pseudonymised"}],"experience":{"claims":30,"years":[2021,2022,2023,2024,2025],"total":427123.7444394728,"freq":0.06289308176100629,"mean":14237.458147982426,"median":6819.910358835575,"p90":34655.365361896096,"max":55301.15859476266,"by_cause":{"crime":50073.38768982314,"fire":65738.26006387462,"weather":81711.04837635269,"water":84734.0687677139,"auto.collision":40089.75635916762,"liability.slip_trip":104777.22318254084},"by_year":{"2021":61072.156500130324,"2022":85576.75753301417,"2023":78262.1592495688,"2024":119505.39786062409,"2025":82707.2732961354}},"peers":[{"id":"northwind","name":"Northwind Logistics","score":0.975,"location":true,"activity_depth":4,"size_ratio":1.33,"included":true},{"id":"fabrikam","name":"Fabrikam Freight","score":0.243,"location":false,"activity_depth":1,"size_ratio":2.22,"included":false}],"pool":{"claims":31,"tokens":["abffd54f1ddc"],"banded":false},"benchmark":{"own_frequency":0.06289308176100629,"pool_frequency":0.04874213836477988,"own_mean_severity":14237.458147982426,"pool_mean_severity":14186.655306770737,"pool_claim_count":31,"pool_members":1,"credibility":0.545,"blended_frequency":0.056460834762721554,"blended_mean_severity":14214.36594743166,"top_pool_causes":[["auto.collision",114991.1080424981],["water",99454.57770261433],["fire",99431.07643261961],["liability.slip_trip",45228.231136441296],["crime",44206.85783531852]]},"shared_issues":[{"owner_token":"abffd54f1ddc","origin_issue_id":"0977c36e196442bfa0bbab5b199d8686","category":"fire.hot_work","title":"Hot work permits not enforced","severity":"high","likelihood":0.4},{"owner_token":"abffd54f1ddc","origin_issue_id":"79a30febb95f4c8c9d6b10289d0af529","category":"injury.vehicle","title":"Forklift pedestrian segregation missing","severity":"medium","likelihood":0.5}],"issues":[{"title":"Sprinkler impairment during roof works","category":"fire.protection","severity":"critical","likelihood":0.3,"source":"assessor","score":1.2}],"alerts":[],"signals":[{"metric":"temperature_c","value":21.0,"at":"2025-12-01T08:00:00"},{"metric":"temperature_c","value":22.0,"at":"2025-12-01T09:00:00"},{"metric":"temperature_c","value":23.0,"at":"2025-12-01T10:00:00"}],"model":{"freq":5.386363636363637,"modifier":1.15,"notes":["+15% open fire issue"],"mu":9.051175511022675,"sigma":1.0107748588045662,"exp_sev":14214.365947431652,"eal":88048.3054311931,"basis":"credibility 0.55 own / 0.45 pool"},"sim":{"trials":20000,"mean":88437.5730981323,"p50":76706.08640880795,"p75":115246.63646251647,"p90":162629.72293722435,"p95":197436.26012686742,"p99":290109.38660366624,"max":927888.3236635879,"hist":{"counts":[277,491,844,1091,1247,1431,1445,1473,1341,1341,1196,1050,966,854,763,615,544,463,375,299,291,246,192,184,156,117,104,90,68,58,61,39,33,27,25,25,25,20,18,115],"max":330901.93502169184}},"appetite":400000.0,"decision":{"recommended":25000,"reasons":["lowest total cost of risk among feasible options (125,824)","expected retained 68,428, premium indication 27,013","1-in-100 retained 159,204 within appetite 400,000"],"rejected":{},"options":[{"sir":25000,"aggregate_cap":null,"expected_retained":68428.22777099178,"retained_p90":112790.97306357369,"retained_p95":129195.1218354481,"retained_p99":159203.93039236843,"expected_ceded":20009.345327140763,"premium_indication":27012.61619164003,"total_cost_of_risk":125824.29099485997,"volatility_charge":30383.447032228156},{"sir":50000,"aggregate_cap":null,"expected_retained":80552.9468808882,"retained_p90":140200.8138785475,"retained_p95":161968.21643836083,"retained_p99":206619.9938114989,"expected_ceded":7884.626217244149,"premium_indication":10644.245393279602,"total_cost_of_risk":131904.82705290412,"volatility_charge":40707.63477873632},{"sir":100000,"aggregate_cap":null,"expected_retained":86222.35334300845,"retained_p90":157391.40862427026,"retained_p95":186858.0261116975,"retained_p99":243902.1818311704,"expected_ceded":2215.219755123725,"premium_indication":2990.546669417029,"total_cost_of_risk":139530.73639677,"volatility_charge":50317.83638434452},{"sir":250000,"aggregate_cap":null,"expected_retained":88228.39775297696,"retained_p90":162629.72293722435,"retained_p95":197436.26012686742,"retained_p99":287227.4497258013,"expected_ceded":209.1753451552868,"premium_indication":282.38671595963723,"total_cost_of_risk":143114.71565588182,"volatility_charge":54603.93118694523},{"sir":500000,"aggregate_cap":null,"expected_retained":88418.29233379818,"retained_p90":162629.72293722435,"retained_p95":197436.26012686742,"retained_p99":290109.38660366624,"expected_ceded":19.280764334125514,"premium_indication":26.029031851069448,"total_cost_of_risk":142953.30526218386,"volatility_charge":54508.98389653462}]}},"fabrikam":{"name":"Fabrikam Freight","activity_code":"4841","revenue":200000000.0,"regions":["South West"],"locations":["Bristol Depot"],"consents":[],"experience":{"claims":52,"years":[2021,2022,2023,2024,2025],"total":1637044.8033873022,"freq":0.04905660377358491,"mean":31481.630834371193,"median":14973.923505240118,"p90":50524.65770399539,"max":288015.41530513484,"by_cause":{"liability.slip_trip":142419.31689344137,"crime":146266.0556867518,"water":406941.2152306617,"auto.collision":22161.294138583402,"fire":323213.9465213629,"weather":596042.9749165009},"by_year":{"2021":500662.40697980573,"2022":156405.4446870072,"2023":445262.52805677464,"2024":183772.9921303694,"2025":350941.4315333451}},"peers":[{"id":"northwind","name":"Northwind Logistics","score":0.268,"location":false,"activity_depth":1,"size_ratio":0.6,"included":false},{"id":"contoso","name":"Contoso Distribution","score":0.243,"location":false,"activity_depth":1,"size_ratio":0.45,"included":false}],"pool":{"claims":30,"tokens":["aggregated"],"banded":true},"benchmark":null,"shared_issues":[{"owner_token":"abffd54f1ddc","origin_issue_id":"0977c36e196442bfa0bbab5b199d8686","category":"fire.hot_work","title":"Hot work permits not enforced","severity":"high","likelihood":0.4},{"owner_token":"abffd54f1ddc","origin_issue_id":"79a30febb95f4c8c9d6b10289d0af529","category":"injury.vehicle","title":"Forklift pedestrian segregation missing","severity":"medium","likelihood":0.5}],"issues":[],"alerts":[],"signals":[],"model":{"freq":10.4,"modifier":1.0,"notes":[],"mu":9.62707072948926,"sigma":1.1478788531468482,"exp_sev":29315.851637797903,"eal":304884.8570330982,"basis":"own experience only"},"sim":{"trials":20000,"mean":304609.78284625005,"p50":268783.14270174195,"p75":385921.4597535848,"p90":522125.90743376006,"p95":631494.4138161755,"p99":924762.4438179198,"max":3203541.713974268,"hist":{"counts":[31,209,439,787,1077,1335,1459,1593,1520,1478,1401,1254,1063,962,851,712,623,537,440,395,300,245,202,145,137,112,96,79,84,59,56,40,24,38,30,25,19,15,11,117],"max":1069601.370712242}},"appetite":400000.0,"decision":{"recommended":25000,"reasons":["lowest total cost of risk among feasible options (404,540)","expected retained 158,703, premium indication 196,974","1-in-100 retained 304,728 within appetite 400,000"],"rejected":{"50000":"1-in-100 retained 445,347 exceeds appetite 400,000","100000":"1-in-100 retained 578,698 exceeds appetite 400,000","250000":"1-in-100 retained 751,844 exceeds appetite 400,000","500000":"1-in-100 retained 850,531 exceeds appetite 400,000"},"options":[{"sir":25000,"aggregate_cap":null,"expected_retained":158702.93827972416,"retained_p90":233244.84733966767,"retained_p95":256427.7312029228,"retained_p99":304728.28532012977,"expected_ceded":145906.84456652583,"premium_indication":196974.2401648099,"total_cost_of_risk":404539.5749061334,"volatility_charge":48862.39646159932},{"sir":50000,"aggregate_cap":null,"expected_retained":216741.09456804462,"retained_p90":329682.2043725487,"retained_p95":366709.9003445484,"retained_p99":445346.55823511974,"expected_ceded":87868.68827820432,"premium_indication":118622.72917557585,"total_cost_of_risk":410348.22663187236,"volatility_charge":74984.40288825189},{"sir":100000,"aggregate_cap":null,"expected_retained":262286.3102499773,"retained_p90":418404.3050243262,"retained_p95":472880.99554433674,"retained_p99":578698.412257402,"expected_ceded":42323.47259627142,"premium_indication":57136.688004966425,"total_cost_of_risk":424720.3409021234,"volatility_charge":105297.34264717973},{"sir":250000,"aggregate_cap":null,"expected_retained":293770.82007815596,"retained_p90":499279.47630928503,"retained_p95":576724.8403417205,"retained_p99":751843.5786535703,"expected_ceded":10838.962768094667,"premium_indication":14632.599736927801,"total_cost_of_risk":449880.429946866,"volatility_charge":141477.01013178227},{"sir":500000,"aggregate_cap":null,"expected_retained":301720.47225197556,"retained_p90":522125.90743376006,"retained_p95":627011.8113369939,"retained_p99":850531.0479011544,"expected_ceded":2889.310594274284,"premium_indication":3900.569302270284,"total_cost_of_risk":468266.71109675505,"volatility_charge":162645.6695425092}]}}};
+const ORDER = ["northwind","contoso","fabrikam"];
+const fmt = n => n >= 1e6 ? (n/1e6).toFixed(2).replace(/\.?0+$/,'')+"M" : n >= 10000 ? Math.round(n/1000)+"K" : Math.round(n).toLocaleString();
+const money = n => "$" + Math.round(n).toLocaleString();
+const pct = n => (n*100).toFixed(0)+"%";
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+const tip = document.getElementById("tip");
+function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
+function moveTip(e){ const x = Math.min(e.clientX + 14, window.innerWidth - 270); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
+function hideTip(){ tip.style.opacity = 0; }
+function hover(el, html){ el.addEventListener("mouseenter", e => showTip(e, html)); el.addEventListener("mousemove", moveTip); el.addEventListener("mouseleave", hideTip); }
+const svgNS = "http://www.w3.org/2000/svg";
+function el(tag, attrs, parent){ const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
+function chart(mount, w, h){ const m = document.getElementById(mount); m.innerHTML = ""; const s = el("svg", {viewBox:`0 0 ${w} ${h}`, class:"chart", role:"img"}); m.appendChild(s); return s; }
+function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const f = v/p; const n = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10; return n*p; }
+function yGrid(s, x0, x1, y0, y1, max, ticks, fmtFn){ const g = el("g", {class:"grid"}, s); for (let i=0;i<=ticks;i++){ const v = max*i/ticks, y = y1 - (y1-y0)*i/ticks; if (i>0) el("line", {x1:x0, x2:x1, y1:y, y2:y}, g); el("text", {x:x0-6, y:y+4, "text-anchor":"end"}, s).textContent = fmtFn(v); } el("line", {x1:x0, x2:x1, y1:y1, y2:y1, class:"axis"}, s); }
+function barPath(x, y, w, h, r){ if (h <= r) return `M${x},${y+h} v${-h} h${w} v${h} z`; return `M${x},${y+h} v${-(h-r)} a${r},${r} 0 0 1 ${r},${-r} h${w-2*r} a${r},${r} 0 0 1 ${r},${r} v${h-r} z`; }
+function hbarPath(x, y, w, h, r){ if (w <= r) return `M${x},${y} h${w} v${h} h${-w} z`; return `M${x},${y} h${w-r} a${r},${r} 0 0 1 ${r},${r} v${h-2*r} a${r},${r} 0 0 1 ${-r},${r} h${-(w-r)} z`; }
+
+function columnChart(mount, items, opts){
+  const W = 520, H = 220, L = 52, R = 12, T = 14, B = 30;
+  const s = chart(mount, W, H);
+  const max = niceMax(Math.max(...items.map(i => i.v)) * 1.1);
+  yGrid(s, L, W-R, T, H-B, max, 4, v => fmt(v));
+  const band = (W-L-R)/items.length, bw = Math.min(24, band*0.6);
+  items.forEach((it, i) => {
+    const x = L + band*i + (band-bw)/2, h = (H-B-T)*it.v/max, y = H-B-h;
+    el("path", {d: barPath(x, y, bw, h, 4), fill: it.color || "var(--s1)"}, s);
+    el("text", {x: x+bw/2, y: H-B+16, "text-anchor":"middle"}, s).textContent = it.label;
+    if (opts && opts.labelMax && it.v === Math.max(...items.map(j => j.v))) el("text", {x: x+bw/2, y: y-5, "text-anchor":"middle", class:"lab"}, s).textContent = fmt(it.v);
+    const hit = el("rect", {x: L+band*i, y: T, width: band, height: H-B-T, class:"hit"}, s);
+    hover(hit, `<b>${esc(it.label)}</b>${it.tip || money(it.v)}`);
+  });
+}
+function hbarChart(mount, items){
+  const rowH = 26, W = 520, L = 130, R = 60, H = items.length*rowH + 8;
+  const s = chart(mount, W, H);
+  const max = Math.max(...items.map(i => i.v));
+  items.forEach((it, i) => {
+    const y = 4 + rowH*i + 5, w = (W-L-R)*it.v/max;
+    el("text", {x: L-8, y: y+12, "text-anchor":"end", class:"lab"}, s).textContent = it.label;
+    el("path", {d: hbarPath(L, y, Math.max(w, 2), 16, 4), fill:"var(--s1)"}, s);
+    el("text", {x: L+w+6, y: y+12, class:"lab"}, s).textContent = fmt(it.v);
+    hover(el("rect", {x:0, y: 4+rowH*i, width: W, height: rowH, class:"hit"}, s), `<b>${esc(it.label)}</b>${money(it.v)} · ${pct(it.v/it.total)} of total`);
+  });
+  el("line", {x1:L, x2:L, y1:2, y2:H-2, class:"axis"}, s);
+}
+function iotChart(mount, signals, thr){
+  const W = 520, H = 170, L = 40, R = 12, T = 14, B = 26;
+  const s = chart(mount, W, H);
+  const vals = signals.map(g => g.value);
+  const max = niceMax(Math.max(...vals, thr.critical) * 1.15);
+  yGrid(s, L, W-R, T, H-B, max, 4, v => v);
+  const x = i => L + (W-L-R)*i/(signals.length-1), y = v => H-B - (H-B-T)*v/max;
+  el("line", {x1:L, x2:W-R, y1:y(thr.warn), y2:y(thr.warn), class:"thr"}, s);
+  el("text", {x: L+4, y: y(thr.warn)-4}, s).textContent = "warn " + thr.warn;
+  el("line", {x1:L, x2:W-R, y1:y(thr.critical), y2:y(thr.critical), class:"thr2"}, s);
+  el("text", {x: L+4, y: y(thr.critical)-4}, s).textContent = "critical " + thr.critical;
+  const area = signals.map((g,i) => `${i?"L":"M"}${x(i)},${y(g.value)}`).join(" ") + ` L${x(signals.length-1)},${H-B} L${L},${H-B} Z`;
+  el("path", {d: area, fill:"var(--s1)", opacity:.1}, s);
+  el("path", {d: signals.map((g,i) => `${i?"L":"M"}${x(i)},${y(g.value)}`).join(" "), fill:"none", stroke:"var(--s1)", "stroke-width":2, "stroke-linejoin":"round"}, s);
+  signals.forEach((g,i) => {
+    const sev = g.value >= thr.critical ? "critical" : g.value >= thr.warn ? "high" : null;
+    const c = el("circle", {cx:x(i), cy:y(g.value), r: sev ? 5 : 4, fill: sev ? (sev==="critical" ? "var(--critical)" : "var(--serious)") : "var(--s1)", stroke:"var(--card)", "stroke-width":2}, s);
+    el("text", {x:x(i), y:H-B+16, "text-anchor":"middle"}, s).textContent = g.at.slice(11,16);
+    hover(el("circle", {cx:x(i), cy:y(g.value), r:12, class:"hit"}, s), `<b>${g.at.slice(0,16).replace("T"," ")}</b>${g.value} ${esc(g.metric)}${sev ? " · " + sev : ""}`);
+  });
+}
+function histChart(mount, sim){
+  const W = 620, H = 220, L = 44, R = 12, T = 14, B = 30;
+  const s = chart(mount, W, H);
+  const counts = sim.hist.counts, n = counts.length, total = counts.reduce((a,b)=>a+b,0);
+  const maxShare = niceMax(Math.max(...counts)/total*1.1);
+  yGrid(s, L, W-R, T, H-B, maxShare, 4, v => (v*100).toFixed(0)+"%");
+  const bw = (W-L-R)/n;
+  counts.forEach((c,i) => {
+    const h = (H-B-T)*(c/total)/maxShare, x = L + bw*i;
+    el("path", {d: barPath(x+1, H-B-h, bw-2, h, 3), fill:"var(--s1)"}, s);
+    const lo = sim.hist.max*i/n, hi = sim.hist.max*(i+1)/n;
+    hover(el("rect", {x, y:T, width:bw, height:H-B-T, class:"hit"}, s), `<b>${money(lo)} – ${money(hi)}</b>${pct(c/total)} of years (${c.toLocaleString()} of ${total.toLocaleString()})`);
+  });
+  for (let i=0;i<=4;i++){ const v = sim.hist.max*i/4; el("text", {x: L+(W-L-R)*i/4, y: H-B+16, "text-anchor": i===0?"start":i===4?"end":"middle"}, s).textContent = fmt(v); }
+  [["mean", sim.mean],["P90", sim.p90],["P99", sim.p99]].forEach(([k,v],j) => {
+    const x = L + (W-L-R)*Math.min(v/sim.hist.max, 1);
+    el("line", {x1:x, x2:x, y1:T+14, y2:H-B, class:"ref"}, s);
+    el("text", {x:x+4, y:T+10, class:"lab"}, s).textContent = `${k} ${fmt(v)}`;
+  });
+}
+function tcorChart(mount, opts, rec){
+  const W = 620, H = 240, L = 52, R = 12, T = 14, B = 30;
+  const s = chart(mount, W, H);
+  const max = niceMax(Math.max(...opts.map(o => o.total_cost_of_risk))*1.12);
+  yGrid(s, L, W-R, T, H-B, max, 4, v => fmt(v));
+  const band = (W-L-R)/opts.length, bw = Math.min(24, band*0.5);
+  opts.forEach((o,i) => {
+    const x = L + band*i + (band-bw)/2;
+    const parts = [[o.expected_retained,"var(--s1)","Expected retained"],[o.premium_indication,"var(--s2)","Premium indication"],[o.volatility_charge,"var(--s3)","Volatility charge"]];
+    let y = H-B;
+    parts.forEach(([v,c],k) => { const h = (H-B-T)*v/max; y -= h; if (h > 0) el("path", {d: k===2 ? barPath(x, y, bw, Math.max(h-2,0), 4) : `M${x},${y} h${bw} v${Math.max(h-2,0)} h${-bw} z`, fill:c}, s); });
+    const lab = el("text", {x:x+bw/2, y:y-6, "text-anchor":"middle", class:"lab"}, s); lab.textContent = fmt(o.total_cost_of_risk); if (o.sir===rec) lab.setAttribute("font-weight","600");
+    el("text", {x:x+bw/2, y:H-B+16, "text-anchor":"middle", "font-weight": o.sir===rec ? "600" : "400"}, s).textContent = "$" + fmt(o.sir);
+    hover(el("rect", {x:L+band*i, y:T, width:band, height:H-B-T, class:"hit"}, s), `<b>SIR ${money(o.sir)}</b>` + parts.map(([v,,n]) => `${n}: ${money(v)}`).join("<br>") + `<br>TCOR: ${money(o.total_cost_of_risk)}`);
+  });
+}
+
+const THR = {water_flow_lpm:{warn:20,critical:60}, temperature_c:{warn:45,critical:60}};
+const CONSENT_WORDS = {loss_history:"Loss history", risk_issues:"Risk issues", iot_signals:"IoT signals", community:"whole community", cohort_location:"same-region cohort", cohort_activity:"same-activity cohort", none:"nobody", aggregated:"banded aggregates", pseudonymised:"pseudonymised records", identified:"identified records"};
+
+function render(id){
+  const d = DATA[id];
+  document.querySelectorAll("#client-seg button").forEach(b => b.setAttribute("aria-pressed", b.dataset.id===id));
+  document.getElementById("client-name").textContent = d.name;
+  document.getElementById("client-meta").textContent = `activity ${d.activity_code} · ${d.regions.join(", ")} · ${d.locations.length} location${d.locations.length>1?"s":""} · revenue ${money(d.revenue)}`;
+  const ex = d.experience, m = d.model, sim = d.sim, dec = d.decision;
+  document.getElementById("tiles").innerHTML = [
+    ["Claims on record", ex.claims, `${ex.years[0]}–${ex.years[ex.years.length-1]}, all lines`],
+    ["Trended incurred", money(ex.total), `mean ${money(ex.mean)}, P90 ${money(ex.p90)}`],
+    ["Frequency", ex.freq.toFixed(3), "claims per $1M revenue per year"],
+    ["Modelled expected annual loss", money(m.eal), `${m.freq.toFixed(1)} claims × modifier ${m.modifier.toFixed(2)} × ${money(m.exp_sev)}`],
+  ].map(([l,v,s]) => `<div class="card tile"><div class="eyebrow">${l}</div><div class="v">${v}</div><div class="d">${s}</div></div>`).join("");
+
+  const years = Object.keys(ex.by_year).sort();
+  columnChart("c-year", years.map(y => ({label:y, v:ex.by_year[y]})), {labelMax:true});
+  const causes = Object.entries(ex.by_cause).sort((a,b)=>b[1]-a[1]);
+  hbarChart("c-cause", causes.map(([k,v]) => ({label:k, v, total:ex.total})));
+
+  document.getElementById("issues").innerHTML = d.issues.sort((a,b)=>b.score-a.score).map(i => `<li><span class="chip ${i.severity}"><i></i>${cap(i.severity)}</span><div class="t">${esc(i.title)}<small><span class="mono">${esc(i.category)}</span> · likelihood ${pct(i.likelihood)} · score ${i.score.toFixed(1)}</small></div><span class="chip src">${i.source}</span></li>`).join("") || `<li><div class="t">No open issues.</div></li>`;
+
+  const metric = d.signals.length ? d.signals[0].metric : null;
+  document.getElementById("iot-sub").textContent = metric ? `${metric.replace(/_/g," ")} on ${d.locations[0]}, 1 Dec 2025 · thresholds from the default table` : "No devices connected";
+  if (metric) iotChart("c-iot", d.signals, THR[metric]); else document.getElementById("c-iot").innerHTML = "";
+  document.getElementById("alerts").innerHTML = d.alerts.length
+    ? d.alerts.map(a => `<li><span class="chip ${a.severity}"><i></i>${cap(a.severity)}</span><div class="t">${esc(a.device)} read ${a.value} ${esc(a.metric.replace(/_/g," "))}<small>${a.at.slice(0,16).replace("T"," ")}</small></div></li>`).join("") + (d.alerts.length>=2 ? `<li><div class="t"><small>Repeated alerts on one device were promoted to an IoT-sourced risk issue, and the live monitoring earns a frequency credit in the model.</small></div></li>` : "")
+    : `<li><div class="t"><small>All readings inside thresholds; no alerts raised.</small></div></li>`;
+
+  document.getElementById("consents").innerHTML = ORDER.map(cid => { const c = DATA[cid]; const rows = c.consents.length ? c.consents.map(k => `<dt>${CONSENT_WORDS[k.scope]}</dt><dd>${CONSENT_WORDS[k.audience]} · ${CONSENT_WORDS[k.anon]}</dd>`).join("") : `<dt>Everything</dt><dd>shared with nobody</dd>`; return `<div class="card"><h3>${esc(c.name)}${cid===id ? ' <span class="chip">viewing as</span>' : ""}</h3><div class="sub">activity ${c.activity_code} · ${c.regions.join(", ")}</div><dl class="consent">${rows}</dl></div>`; }).join("");
+
+  document.getElementById("peers-title").textContent = `What ${d.name} can see`;
+  document.getElementById("peers").innerHTML = `<thead><tr><th>Peer</th><th class="r">Score</th><th>Region</th><th>Activity</th><th>In cohort</th><th>Losses received</th></tr></thead><tbody>` + d.peers.map(p => {
+    const pc = DATA[p.id].consents.find(k => k.scope==="loss_history");
+    const audienceOk = pc && (pc.audience==="community" || (pc.audience==="cohort_location" && p.location) || (pc.audience==="cohort_activity" && p.activity_depth>=2));
+    const receives = !p.included ? "nothing (outside cohort)" : !pc ? "nothing (no consent)" : audienceOk ? CONSENT_WORDS[pc.anon] : `nothing (${CONSENT_WORDS[pc.audience]} only)`;
+    return `<tr><td>${esc(p.name)}</td><td class="r">${p.score.toFixed(2)}</td><td>${p.location ? "same" : "different"}</td><td>${p.activity_depth} of 4 digits</td><td><span class="chip ${p.included?"ok":"no"}"><i></i>${p.included?"yes":"no"}</span></td><td>${receives}</td></tr>`; }).join("") + `</tbody>`;
+
+  document.getElementById("shared-issues").innerHTML = d.shared_issues.length ? d.shared_issues.map(i => `<li><span class="chip ${i.severity}"><i></i>${cap(i.severity)}</span><div class="t">${esc(i.title)}<small>from <span class="mono">${i.owner_token}</span> · <span class="mono">${esc(i.category)}</span></small></div></li>`).join("") : `<li><div class="t"><small>No peer has consented to share issues with ${esc(d.name)}.</small></div></li>`;
+
+  const b = d.benchmark;
+  document.getElementById("bench").innerHTML = b ? [
+    ["Frequency per $1M", b.own_frequency.toFixed(3), b.pool_frequency.toFixed(3), b.blended_frequency.toFixed(3)],
+    ["Mean severity", money(b.own_mean_severity), money(b.pool_mean_severity), money(b.blended_mean_severity)],
+  ].map(([l,o,p,bl]) => `<div class="card"><h3>${l}</h3><div class="sub">own · pool · blended</div><table><tr><td>Own</td><td class="r">${o}</td></tr><tr><td>Pool (${b.pool_claim_count} claims, ${b.pool_members} member${b.pool_members>1?"s":""})</td><td class="r">${p}</td></tr><tr><td><b>Blended</b></td><td class="r"><b>${bl}</b></td></tr></table></div>`).join("")
+    + `<div class="card"><h3>Credibility on own data</h3><div class="sub">Z = ${ex.claims} / (${ex.claims} + 25)</div><div class="tile"><div class="v">${(b.credibility*100).toFixed(0)}%</div></div><div class="meter"><i style="width:${b.credibility*100}%"></i></div><div class="d" style="color:var(--ink-2);font-size:12px;margin-top:8px">Top pool causes: ${b.top_pool_causes.slice(0,3).map(c => esc(c[0])).join(", ")}</div></div>`
+    : `<div class="card"><h3>No pooled data</h3><p style="color:var(--ink-2)">No peer has consented to share losses that ${esc(d.name)} qualifies for, so the model runs on own experience only.</p></div>`;
+
+  document.getElementById("model-cards").innerHTML = `
+    <div class="card"><h3>Frequency</h3><div class="sub">${esc(m.basis)}</div><table><tr><td>Base annual claims</td><td class="r">${m.freq.toFixed(2)}</td></tr><tr><td>Modifier</td><td class="r">× ${m.modifier.toFixed(3)}</td></tr><tr><td><b>Modelled λ</b></td><td class="r"><b>${(m.freq*m.modifier).toFixed(2)}</b></td></tr></table></div>
+    <div class="card"><h3>Severity</h3><div class="sub">Lognormal, fitted on trended amounts</div><table><tr><td>μ</td><td class="r">${m.mu.toFixed(3)}</td></tr><tr><td>σ</td><td class="r">${m.sigma.toFixed(3)}</td></tr><tr><td><b>Expected severity</b></td><td class="r"><b>${money(m.exp_sev)}</b></td></tr></table></div>
+    <div class="card"><h3>Modifiers applied</h3><div class="sub">From the risk register and device coverage</div><ul class="list">${m.notes.length ? m.notes.map(n => `<li><span class="chip ${n.startsWith("+")?"high":"ok"}"><i></i>${n.split(" ")[0]}</span><div class="t">${esc(n.slice(n.indexOf(" ")+1))}</div></li>`).join("") : `<li><div class="t">None: no open issues in a modelled category and no monitoring.</div></li>`}</ul></div>`;
+
+  histChart("c-hist", sim);
+  document.getElementById("pct").innerHTML = `<thead><tr><th>Return period</th><th class="r">Annual loss</th></tr></thead><tbody>` + [["Mean", sim.mean],["1 in 2 (P50)", sim.p50],["1 in 4 (P75)", sim.p75],["1 in 10 (P90)", sim.p90],["1 in 20 (P95)", sim.p95],["1 in 100 (P99)", sim.p99],["Worst simulated", sim.max]].map(([k,v]) => `<tr><td>${k}</td><td class="r">${money(v)}</td></tr>`).join("") + `</tbody>`;
+
+  document.getElementById("rec-sir").textContent = dec.recommended != null ? money(dec.recommended) : "None";
+  document.getElementById("rec-sub").textContent = `Appetite: 1-in-100 retained loss no more than ${money(d.appetite)}`;
+  document.getElementById("reasons").innerHTML = dec.reasons.map(r => `<li>${esc(r)}</li>`).join("");
+  tcorChart("c-tcor", dec.options, dec.recommended);
+  document.getElementById("opt-sub").textContent = `${Object.keys(dec.rejected).length} of ${dec.options.length} candidates breach the appetite`;
+  document.getElementById("options").innerHTML = `<thead><tr><th>SIR</th><th class="r">E[retained]</th><th class="r">P95 retained</th><th class="r">P99 retained</th><th class="r">E[ceded]</th><th class="r">Premium</th><th class="r">TCOR</th><th>Status</th></tr></thead><tbody>` + dec.options.map(o => {
+    const rej = dec.rejected[String(o.sir)] || dec.rejected[String(o.sir.toFixed(1))];
+    const cls = o.sir===dec.recommended ? "rec" : rej ? "rej" : "";
+    const status = o.sir===dec.recommended ? `<span class="chip ok"><i></i>recommended</span>` : rej ? `<span class="chip no"><i></i>breaches appetite</span>` : `<span class="chip"><i></i>feasible</span>`;
+    return `<tr class="${cls}"><td class="num">${money(o.sir)}</td><td class="r">${money(o.expected_retained)}</td><td class="r">${money(o.retained_p95)}</td><td class="r">${money(o.retained_p99)}</td><td class="r">${money(o.expected_ceded)}</td><td class="r">${money(o.premium_indication)}</td><td class="r"><b>${money(o.total_cost_of_risk)}</b></td><td>${status}</td></tr>`; }).join("") + `</tbody>`;
+}
+
+const seg = document.getElementById("client-seg");
+ORDER.forEach(id => { const b = document.createElement("button"); b.type = "button"; b.dataset.id = id; b.id = "seg-" + id; b.textContent = DATA[id].name.split(" ")[0]; b.addEventListener("click", () => { render(id); try { localStorage.setItem("riskintel-client", id); } catch (e) {} }); seg.appendChild(b); });
+let start = "northwind"; try { const s = localStorage.getItem("riskintel-client"); if (s && DATA[s]) start = s; } catch (e) {}
+render(start);
+</script>
+
+</body>
+</html>

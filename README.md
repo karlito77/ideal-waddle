@@ -18,6 +18,7 @@ uvicorn riskintel.api.app:app     # REST API, docs at /docs
 Read next:
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): contexts, data flow, design decisions, what is real vs stubbed
+- [docs/demo.html](docs/demo.html): interactive demo page built from the pipeline output (open in a browser)
 - [docs/API.md](docs/API.md): endpoint list and example requests
 - [docs/ROADMAP.md](docs/ROADMAP.md): phased build-out
 
