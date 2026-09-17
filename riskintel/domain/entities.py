@@ -6,7 +6,7 @@ from datetime import date, datetime
 from typing import Optional
 from uuid import uuid4
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, computed_field, model_validator
 
 from .enums import (
     AnonymisationLevel,
@@ -94,10 +94,12 @@ class LossEvent(BaseModel):
     currency: str = "USD"
     description: str = ""
 
+    @computed_field  # type: ignore[misc]
     @property
     def incurred(self) -> float:
         return self.paid + self.reserved
 
+    @computed_field  # type: ignore[misc]
     @property
     def exposure_year(self) -> int:
         return self.occurrence_date.year
@@ -126,6 +128,7 @@ class RiskIssue(BaseModel):
     origin_issue_id: Optional[str] = None   # set when the issue was copied in from a peer
     tags: list[str] = Field(default_factory=list)
 
+    @computed_field  # type: ignore[misc]
     @property
     def score(self) -> float:
         weight = {Severity.LOW: 1, Severity.MEDIUM: 2, Severity.HIGH: 3, Severity.CRITICAL: 4}

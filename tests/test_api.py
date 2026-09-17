@@ -58,3 +58,10 @@ def test_iot_signal_ingest_raises_issue():
 def test_unknown_client_404():
     assert client().get("/clients/nope").status_code == 404
     assert client().post("/models/nope/fit").status_code == 404
+
+
+def test_invalid_loss_record_is_422_not_500():
+    r = client().post("/losses", json=[{"client_id": NORTHWIND, "line_of_business": "property", "cause_of_loss": "x",
+                                        "occurrence_date": "2025-05-01", "report_date": "2025-04-01"}])
+    assert r.status_code == 422
+    assert "report_date" in r.json()["detail"][0]["msg"]

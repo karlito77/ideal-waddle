@@ -16,7 +16,7 @@ from __future__ import annotations
 from datetime import date
 from typing import Optional
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 from riskintel.domain import LineOfBusiness, LossEvent, LossStatus
 
@@ -57,6 +57,12 @@ class LossRecordIn(BaseModel):
     status: LossStatus = LossStatus.OPEN
     currency: str = "USD"
     description: str = ""
+
+    @model_validator(mode="after")
+    def _dates(self) -> "LossRecordIn":
+        if self.report_date and self.report_date < self.occurrence_date:
+            raise ValueError("report_date cannot precede occurrence_date")
+        return self
 
 
 def map_cause(raw: str) -> str:
