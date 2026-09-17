@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Riskintel API Walkthrough</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  color-scheme:light;
+  --page:#f3f5f8; --card:#ffffff; --card-2:#f7f9fb; --code:#0f1419; --code-ink:#e6edf3; --ink:#111519; --ink-2:#4b545e; --muted:#7a838d;
+  --line:rgba(17,21,25,.10); --accent:#1c5cab; --accent-wash:rgba(28,92,171,.08);
+  --get:#2a78d6; --post:#1baf7a; --ok:#0ca30c; --bad:#d03b3b;
+  --k:#8fc4ff; --s:#f2c99b; --n:#a6e3b7; --b:#d4b5ff; --c:#8b949e;
+  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
+  --sans:"IBM Plex Sans",system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    color-scheme:dark;
+    --page:#0e1114; --card:#171b20; --card-2:#1d2228; --code:#0a0d10; --code-ink:#e6edf3; --ink:#f2f4f6; --ink-2:#b4bcc6; --muted:#838c96;
+    --line:rgba(255,255,255,.10); --accent:#5598e7; --accent-wash:rgba(85,152,231,.12); --get:#3987e5; --post:#199e70;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --page:#0e1114; --card:#171b20; --card-2:#1d2228; --code:#0a0d10; --code-ink:#e6edf3; --ink:#f2f4f6; --ink-2:#b4bcc6; --muted:#838c96;
+  --line:rgba(255,255,255,.10); --accent:#5598e7; --accent-wash:rgba(85,152,231,.12); --get:#3987e5; --post:#199e70;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-inline:16px}
+h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
+h1{font-size:20px} h2{font-size:15px} h3{font-size:13px;color:var(--ink-2);font-weight:500}
+p{margin:0}
+.head{display:flex;flex-wrap:wrap;align-items:flex-end;gap:8px 24px;margin-bottom:18px}
+.head p{color:var(--ink-2);max-width:70ch}
+.head .mono{color:var(--muted)}
+.mono{font-family:var(--mono);font-size:12px}
+.controls{display:flex;gap:8px;margin-left:auto}
+button{font:500 13px var(--sans);border:1px solid var(--line);background:var(--card);color:var(--ink);padding:6px 12px;border-radius:7px;cursor:pointer}
+button.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+button:disabled{opacity:.5;cursor:default}
+button:focus-visible,.steplist button:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+
+.layout{display:grid;grid-template-columns:280px 1fr;gap:14px;align-items:start}
+@media (max-width:760px){.layout{grid-template-columns:1fr}}
+.card{background:var(--card);border:1px solid var(--line);border-radius:10px;min-width:0}
+.steplist{padding:6px;display:flex;flex-direction:column;gap:2px;max-height:70vh;overflow:auto;position:sticky;top:12px}
+@media (max-width:760px){.steplist{position:static;max-height:220px}}
+.steplist button{display:grid;grid-template-columns:22px 1fr auto;gap:8px;align-items:center;text-align:left;border:0;background:transparent;padding:7px 8px;border-radius:6px;color:var(--ink-2);font-weight:400}
+.steplist button .n{font-family:var(--mono);font-size:11px;color:var(--muted)}
+.steplist button .m{font-family:var(--mono);font-size:10.5px;font-weight:500;padding:1px 5px;border-radius:4px;color:#fff}
+.steplist button[aria-current="step"]{background:var(--accent-wash);color:var(--ink);font-weight:500}
+.steplist button.done .n{color:var(--ok)}
+.m.GET{background:var(--get)} .m.POST{background:var(--post)}
+
+.main{padding:16px 18px;display:flex;flex-direction:column;gap:14px}
+.title{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 12px}
+.title .n{font-family:var(--mono);color:var(--muted);font-size:12px}
+.note{color:var(--ink-2);max-width:72ch}
+.block{border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.block .bar{display:flex;align-items:center;gap:10px;padding:7px 12px;background:var(--card-2);border-bottom:1px solid var(--line);font-family:var(--mono);font-size:12px}
+.block .bar .lbl{color:var(--muted);text-transform:uppercase;letter-spacing:.06em;font-size:10.5px;margin-right:auto}
+.status{font-weight:500;padding:1px 7px;border-radius:4px;color:#fff;background:var(--ok)}
+.status.bad{background:var(--bad)}
+pre{margin:0;padding:12px 14px;background:var(--code);color:var(--code-ink);font:12px/1.55 var(--mono);overflow-x:auto;max-height:420px;overflow-y:auto;white-space:pre}
+pre .k{color:var(--k)} pre .s{color:var(--s)} pre .n{color:var(--n)} pre .b{color:var(--b)} pre .c{color:var(--c)}
+.empty{padding:10px 14px;color:var(--muted);font-family:var(--mono);font-size:12px;background:var(--code);color:var(--c)}
+.nav{display:flex;gap:8px;justify-content:flex-end}
+
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);padding:0 12px;margin-top:22px}
+.tab{border:0;border-bottom:2px solid transparent;border-radius:0;background:transparent;padding:10px 12px;color:var(--ink-2)}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.panel{padding:0}
+.panel pre{max-height:520px;border-radius:0 0 10px 10px}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="head">
+    <div>
+      <h1>Risk Intelligence Platform API</h1>
+      <p>A fourth client joins the sample community and is walked from onboarding to a retention decision. Every response below was captured from the running FastAPI app; nothing is mocked.</p>
+      <p class="mono">uvicorn riskintel.api.app:app · 23 operations on 21 paths · 23 tests passing</p>
+    </div>
+    <div class="controls"><button id="run" class="primary" type="button">Run all steps</button><button id="reset" type="button">Reset</button></div>
+  </div>
+
+  <div class="layout">
+    <div class="card steplist" id="steps" role="list"></div>
+    <div class="card main" id="main"></div>
+  </div>
+
+  <div class="card" style="margin-top:22px">
+    <div class="tabs" role="tablist">
+      <button class="tab" role="tab" id="tab-demo" aria-selected="true" type="button">python scripts/demo.py</button>
+      <button class="tab" role="tab" id="tab-test" aria-selected="false" type="button">pytest -q</button>
+      <button class="tab" role="tab" id="tab-tree" aria-selected="false" type="button">package layout</button>
+    </div>
+    <div class="panel" id="panel"></div>
+  </div>
+</div>
+
+<script>
+const D = {"steps":[{"title":"Onboard a client","note":"Register Tailspin in the logistics community with one Yorkshire location and the same activity code as Northwind and Contoso.","method":"POST","path":"/clients","body":{"id":"tailspin","name":"Tailspin Logistics","activity_code":"4931","annual_revenue":60000000,"employee_count":350,"community_ids":["logistics-community"],"locations":[{"id":"ts-1","name":"Doncaster DC","country":"GB","region":"Yorkshire"}]},"status":201,"response":{"id":"tailspin","name":"Tailspin Logistics","activity_code":"4931","annual_revenue":60000000.0,"employee_count":350,"locations":[{"id":"ts-1","name":"Doncaster DC","country":"GB","region":"Yorkshire","latitude":null,"longitude":null,"total_insured_value":null}],"community_ids":["logistics-community"]}},{"title":"Exposure base 2023","note":"Revenue per year normalises frequency to claims per $1M.","method":"POST","path":"/clients/tailspin/exposures","body":{"client_id":"tailspin","year":2023,"revenue":60000000},"status":201,"response":{"client_id":"tailspin","year":2023,"revenue":60000000.0,"payroll":null,"vehicle_count":null,"total_insured_value":null}},{"title":"Exposure base 2024","note":"","method":"POST","path":"/clients/tailspin/exposures","body":{"client_id":"tailspin","year":2024,"revenue":60000000},"status":201,"response":{"client_id":"tailspin","year":2024,"revenue":60000000.0,"payroll":null,"vehicle_count":null,"total_insured_value":null}},{"title":"Exposure base 2025","note":"","method":"POST","path":"/clients/tailspin/exposures","body":{"client_id":"tailspin","year":2025,"revenue":60000000},"status":201,"response":{"client_id":"tailspin","year":2025,"revenue":60000000.0,"payroll":null,"vehicle_count":null,"total_insured_value":null}},{"title":"Ingest a loss run","note":"Three claims. TS-003 is sent twice: the platform dedupes on claim reference and maps free-text causes to its taxonomy.","method":"POST","path":"/losses","body":[{"client_id":"tailspin","claim_reference":"TS-001","line_of_business":"property","cause_of_loss":"Escape of water - burst pipe","occurrence_date":"2023-02-10","paid":18000,"status":"closed"},{"client_id":"tailspin","claim_reference":"TS-002","line_of_business":"general_liability","cause_of_loss":"Visitor slip in yard","occurrence_date":"2024-06-03","paid":4000,"reserved":6000},{"client_id":"tailspin","claim_reference":"TS-003","line_of_business":"property","cause_of_loss":"Forklift collision with racking","occurrence_date":"2025-01-21","paid":9500,"status":"closed"},{"client_id":"tailspin","claim_reference":"TS-003","line_of_business":"property","cause_of_loss":"Forklift collision with racking","occurrence_date":"2025-01-21","paid":9500,"status":"closed"}],"status":201,"response":{"accepted":3,"warnings":["duplicate claim reference TS-003 skipped"]}},{"title":"Read the losses back","note":"Causes are now taxonomy nodes; incurred = paid + reserved.","method":"GET","path":"/losses/tailspin","body":null,"status":200,"response":[{"cause_of_loss":"water","line_of_business":"property","occurrence_date":"2023-02-10","paid":18000.0,"reserved":0.0,"incurred":18000.0,"status":"closed"},{"cause_of_loss":"liability.slip_trip","line_of_business":"general_liability","occurrence_date":"2024-06-03","paid":4000.0,"reserved":6000.0,"incurred":10000.0,"status":"open"},{"cause_of_loss":"auto.collision","line_of_business":"property","occurrence_date":"2025-01-21","paid":9500.0,"reserved":0.0,"incurred":9500.0,"status":"closed"}]},{"title":"Experience summary","note":"Trended to 2025 money at 4% a year.","method":"GET","path":"/losses/tailspin/experience","body":null,"status":200,"response":{"years":[2023,2024,2025],"claim_count":3,"total_incurred":39368.8,"exposure_units":180.0,"frequency_per_unit":0.0167,"mean_severity":13122.9333,"p90_severity":17655.04,"by_cause":{"water":19468.800000000003,"liability.slip_trip":10400.0,"auto.collision":9500.0}}},{"title":"Raise a risk issue","note":"Category is inferred from the title.","method":"POST","path":"/risk-issues","body":{"client_id":"tailspin","location_id":"ts-1","title":"Sprinkler heads obstructed by high racking","severity":"high","likelihood":0.5},"status":201,"response":{"source":"own","category":"fire.protection","title":"Sprinkler heads obstructed by high racking","severity":"high","likelihood":0.5,"score":1.5,"status":"open"}},{"title":"Post IoT readings","note":"Three freeze-sensor readings. Two breach the threshold, so the repeat is promoted to a risk issue automatically.","method":"POST","path":"/iot/signals","body":[{"client_id":"tailspin","location_id":"ts-1","device_id":"freeze-02","metric":"freeze_temperature_c","value":1.0,"observed_at":"2025-12-15T00:00:00"},{"client_id":"tailspin","location_id":"ts-1","device_id":"freeze-02","metric":"freeze_temperature_c","value":-2.0,"observed_at":"2025-12-15T01:00:00"},{"client_id":"tailspin","location_id":"ts-1","device_id":"freeze-02","metric":"freeze_temperature_c","value":-6.0,"observed_at":"2025-12-15T02:00:00"}],"status":201,"response":{"signals":3,"alerts":2,"issues_raised":1}},{"title":"Risk register, ranked","note":"Own issue and the IoT-raised one, ordered by severity \u00d7 likelihood.","method":"GET","path":"/risk-issues/tailspin","body":null,"status":200,"response":[{"source":"own","category":"fire.protection","title":"Sprinkler heads obstructed by high racking","severity":"high","score":1.5},{"source":"iot","category":"water.pipe_freeze","title":"freeze_temperature_c repeatedly above threshold on freeze-02","severity":"high","score":1.5}]},{"title":"Find peers","note":"Cohort score: 45% activity match, 35% same region, 20% size. Fabrikam is missing: different activity and region.","method":"GET","path":"/community/tailspin/peers","body":null,"status":200,"response":[{"peer_id":"contoso","score":0.965,"shares_community":true,"location_overlap":true,"activity_match_depth":4,"size_ratio":1.5},{"peer_id":"northwind","score":0.94,"shares_community":true,"location_overlap":true,"activity_match_depth":4,"size_ratio":2.0}]},{"title":"Pooled experience","note":"Only what peers consented to. Northwind shares pseudonymised records with its activity cohort; Contoso shares banded aggregates with everyone.","method":"GET","path":"/community/tailspin/pool","body":null,"status":200,"response":{"total_records":61,"by_owner":{"abffd54f1ddc":31,"aggregated":30},"first_three":[{"owner_token":"aggregated","line_of_business":"general_liability","cause_of_loss":"crime","exposure_year":2021,"incurred":17500.0,"banded":true},{"owner_token":"aggregated","line_of_business":"general_liability","cause_of_loss":"fire","exposure_year":2021,"incurred":7500.0,"banded":true},{"owner_token":"aggregated","line_of_business":"general_liability","cause_of_loss":"weather","exposure_year":2021,"incurred":7500.0,"banded":true}]}},{"title":"Peer issues shared in","note":"Other members' open issues, under their own sharing rules.","method":"GET","path":"/risk-issues/tailspin/peer","body":null,"status":200,"response":[{"owner_token":"d7d561e6eb09","origin_issue_id":"bfd78463d1ed4cbc94841d1ca8207936","category":"fire.protection","title":"Sprinkler impairment during roof works","severity":"critical","likelihood":0.3},{"owner_token":"abffd54f1ddc","origin_issue_id":"e0c84a0f274a4ee7837bb11bcee7917e","category":"fire.hot_work","title":"Hot work permits not enforced","severity":"high","likelihood":0.4},{"owner_token":"abffd54f1ddc","origin_issue_id":"bdd9831b3e904237890732f7e3831cc3","category":"injury.vehicle","title":"Forklift pedestrian segregation missing","severity":"medium","likelihood":0.5}]},{"title":"Benchmark","note":"Three own claims give credibility 0.11, so the blend leans on the pool.","method":"GET","path":"/community/tailspin/benchmark","body":null,"status":200,"response":{"own_frequency":0.0167,"pool_frequency":0.0548,"own_mean_severity":13647.8507,"pool_mean_severity":14029.2838,"pool_claim_count":61,"pool_members":2,"credibility":0.107,"blended_frequency":0.0507,"blended_mean_severity":13988.416,"top_pool_causes":[["water",196955],["fire",169431],["auto.collision",150991]]}},{"title":"Fit the model","note":"Frequency and severity from the blend, then modifiers from the register and device coverage, then a 5,000-trial simulation.","method":"POST","path":"/models/tailspin/fit?trials=5000","body":null,"status":200,"response":{"model":{"annual_frequency":3.0432,"frequency_modifier":1.1978,"modifiers_applied":["+15% open fire issue","+12% open water issue","-7% IoT monitoring on water"],"severity_mu":9.4951,"severity_sigma":0.3191,"expected_severity":13988.416,"expected_annual_loss":50990.1886,"basis":"credibility 0.11 own / 0.89 pool"},"simulation":{"trials":5000,"mean":50876,"p50":47822,"p75":67683,"p90":88747,"p95":102308,"p99":129434,"max":173408}}},{"title":"SIR decision","note":"Four candidate retentions against a 150,000 appetite on 1-in-100 retained loss.","method":"POST","path":"/decisions/tailspin/sir","body":{"candidate_sirs":[10000,25000,50000,100000],"trials":5000,"appetite":{"max_retained_p99":150000}},"status":200,"response":{"recommended_sir":10000.0,"reasons":["lowest total cost of risk among feasible options (73,430)","expected retained 35,227, premium indication 21,126","1-in-100 retained 87,505 within appetite 150,000"],"rejected":{},"model_basis":"credibility 0.11 own / 0.89 pool","options":[{"sir":10000,"expected_retained":35227,"retained_p95":69380,"retained_p99":87505,"expected_ceded":15649,"premium_indication":21126,"total_cost_of_risk":73430},{"sir":25000,"expected_retained":50613,"retained_p95":102017,"retained_p99":127365,"expected_ceded":263,"premium_indication":355,"total_cost_of_risk":76670},{"sir":50000,"expected_retained":50876,"retained_p95":102308,"retained_p99":129434,"expected_ceded":0,"premium_indication":0,"total_cost_of_risk":76592},{"sir":100000,"expected_retained":50876,"retained_p95":102308,"retained_p99":129434,"expected_ceded":0,"premium_indication":0,"total_cost_of_risk":76592}]}},{"title":"Bad input is rejected","note":"Report date before occurrence date fails validation at the boundary with a 422.","method":"POST","path":"/losses","body":[{"client_id":"tailspin","line_of_business":"property","cause_of_loss":"x","occurrence_date":"2025-05-01","report_date":"2025-04-01"}],"status":422,"response":{"detail":[{"msg":"Value error, report_date cannot precede occurrence_date","loc":["body",0]}]}}],"demo_out":"== Northwind Logistics ==\nclaims 31 over 2021-2025, trended incurred 490,495\nfrequency 0.049 per $1m revenue, mean severity 15,822, p90 23,514\n\n== peers ==\n  contoso    score 0.97 location=True activity_depth=4\n\n== benchmark == pool 30 claims from 1 member(s); credibility on own 0.554\n  frequency own 0.049 vs pool 0.063 -> blended 0.055\n  severity  own 15,822 vs pool 13,867 -> blended 14,949\n\n== shared peer issues ==\n  [critical] Sprinkler impairment during roof works (from d7d561e6eb09)\n\n== model == credibility 0.55 own / 0.45 pool\n  annual frequency 7.00 x modifier 1.1337 (+15% open fire issue, +6% open injury issue, -7% IoT monitoring on water)\n  expected severity 14,949, expected annual loss 118,697\n  aggregate: mean 118,995 p50 108,801 p90 201,504 p95 234,867 p99 308,770\n\n== SIR options (appetite: 1-in-100 retained <= 250,000) ==\n        SIR     E[ret]    P95 ret    P99 ret    premium       TCOR  status\n     25,000     96,889    168,796    204,522     29,843    162,685  recommended\n     50,000    112,216    208,137    257,991      9,151    169,328  1-in-100 retained 257,991 exceeds appetite 250,000\n    100,000    117,741    227,764    290,296      1,692    174,445  1-in-100 retained 290,296 exceeds appetite 250,000\n    250,000    118,950    234,867    308,678         60    176,969  1-in-100 retained 308,678 exceeds appetite 250,000\n    500,000    118,993    234,867    308,770          3    176,933  1-in-100 retained 308,770 exceeds appetite 250,000\n\nreasons:\n  - lowest total cost of risk among feasible options (162,685)\n  - expected retained 96,889, premium indication 29,843\n  - 1-in-100 retained 204,522 within appetite 250,000\n","test_out":".......................                                                  [100%]\n23 passed in 0.67s\n","tree":" 1972 total\nriskintel/__init__.py\nriskintel/analytics/__init__.py\nriskintel/analytics/experience.py\nriskintel/analytics/triangles.py\nriskintel/api/__init__.py\nriskintel/api/app.py\nriskintel/api/deps.py\nriskintel/api/routers/__init__.py\nriskintel/api/routers/clients.py\nriskintel/api/routers/community.py\nriskintel/api/routers/decisions.py\nriskintel/api/routers/iot.py\nriskintel/api/routers/losses.py\nriskintel/api/routers/models.py\nriskintel/api/routers/risk_issues.py\nriskintel/community/__init__.py\nriskintel/community/cohorts.py\nriskintel/community/consent.py\nriskintel/community/exchange.py\nriskintel/decisions/__init__.py\nriskintel/decisions/sir.py\nriskintel/demo.py\nriskintel/domain/__init__.py\nriskintel/domain/entities.py\nriskintel/domain/enums.py\nriskintel/ingestion/__init__.py\nriskintel/ingestion/iot.py\nriskintel/ingestion/loss_history.py\nriskintel/ingestion/risk_issues.py\nriskintel/modelling/__init__.py\nriskintel/modelling/frequency_severity.py\nriskintel/modelling/retention.py\nriskintel/modelling/simulation.py\nriskintel/pipeline.py\nriskintel/storage/__init__.py\nriskintel/storage/repository.py\n"};
+const esc = s => String(s).replace(/[&<>]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;"}[c]));
+function hl(obj){
+  const json = JSON.stringify(obj, null, 2);
+  return esc(json).replace(/("(?:\\.|[^"\\])*")(\s*:)?|\b(true|false|null)\b|-?\b\d+(?:\.\d+)?(?:e[+-]?\d+)?\b/g, (m, str, colon, kw) => {
+    if (str) return colon ? `<span class="k">${str}</span>${colon}` : `<span class="s">${str}</span>`;
+    if (kw) return `<span class="b">${kw}</span>`;
+    return `<span class="n">${m}</span>`;
+  });
+}
+let cur = 0, done = new Set(), timer = null;
+const list = document.getElementById("steps"), main = document.getElementById("main");
+D.steps.forEach((s, i) => {
+  const b = document.createElement("button"); b.type = "button"; b.id = "step-" + i; b.setAttribute("role", "listitem");
+  b.innerHTML = `<span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span><span class="m ${s.method}">${s.method}</span>`;
+  b.addEventListener("click", () => { stop(); show(i); });
+  list.appendChild(b);
+});
+function show(i){
+  cur = i; done.add(i);
+  const s = D.steps[i];
+  list.querySelectorAll("button").forEach((b, j) => { b.toggleAttribute("aria-current", j === i); if (j === i) b.setAttribute("aria-current", "step"); b.classList.toggle("done", done.has(j)); });
+  const ok = s.status < 400;
+  main.innerHTML = `
+    <div class="title"><span class="n">step ${i+1} of ${D.steps.length}</span><h2>${esc(s.title)}</h2></div>
+    ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
+    <div class="block"><div class="bar"><span class="lbl">request</span><span class="m ${s.method}" style="color:#fff;padding:1px 6px;border-radius:4px">${s.method}</span><span>${esc(s.path)}</span></div>${s.body !== null ? `<pre>${hl(s.body)}</pre>` : `<div class="empty">no body</div>`}</div>
+    <div class="block"><div class="bar"><span class="lbl">response</span><span class="status ${ok ? "" : "bad"}">${s.status}</span><span style="color:var(--muted)">${ok ? "application/json" : "validation error"}</span></div><pre>${hl(s.response)}</pre></div>
+    <div class="nav"><button type="button" id="prev" ${i===0?"disabled":""}>Previous</button><button type="button" id="next" class="primary" ${i===D.steps.length-1?"disabled":""}>Next step</button></div>`;
+  document.getElementById("prev").addEventListener("click", () => { stop(); show(i-1); });
+  document.getElementById("next").addEventListener("click", () => { stop(); show(i+1); });
+  const active = list.querySelector('[aria-current="step"]'); if (active) active.scrollIntoView({block:"nearest"});
+}
+function stop(){ if (timer) { clearInterval(timer); timer = null; document.getElementById("run").textContent = "Run all steps"; } }
+document.getElementById("run").addEventListener("click", () => {
+  if (timer) { stop(); return; }
+  done.clear(); show(0); document.getElementById("run").textContent = "Stop";
+  timer = setInterval(() => { if (cur >= D.steps.length-1) { stop(); return; } show(cur+1); }, 900);
+});
+document.getElementById("reset").addEventListener("click", () => { stop(); done.clear(); show(0); });
+
+const panels = { "tab-demo": D.demo_out, "tab-test": D.test_out, "tab-tree": D.tree };
+function tab(id){ document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.id === id)); document.getElementById("panel").innerHTML = `<pre>${esc(panels[id])}</pre>`; }
+document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => tab(t.id)));
+tab("tab-demo");
+show(0);
+</script>
+
+</body>
+</html>

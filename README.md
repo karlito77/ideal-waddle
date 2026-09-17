@@ -19,6 +19,7 @@ Read next:
 
 - [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md): contexts, data flow, design decisions, what is real vs stubbed
 - [docs/demo.html](docs/demo.html): interactive demo page built from the pipeline output (open in a browser)
+- [docs/api-demo.html](docs/api-demo.html): step-through of the REST API with captured requests and responses
 - [docs/API.md](docs/API.md): endpoint list and example requests
 - [docs/ROADMAP.md](docs/ROADMAP.md): phased build-out
 
