@@ -90,7 +90,7 @@ pre .k{color:var(--k)} pre .s{color:var(--s)} pre .n{color:var(--n)} pre .b{colo
   </div>
 
   <div class="layout">
-    <div class="card steplist" id="steps" role="list"></div>
+    <div class="card steplist" id="steps" role="group" aria-label="Walkthrough steps"></div>
     <div class="card main" id="main"></div>
   </div>
 
@@ -118,7 +118,7 @@ function hl(obj){
 let cur = 0, done = new Set(), timer = null;
 const list = document.getElementById("steps"), main = document.getElementById("main");
 D.steps.forEach((s, i) => {
-  const b = document.createElement("button"); b.type = "button"; b.id = "step-" + i; b.setAttribute("role", "listitem");
+  const b = document.createElement("button"); b.type = "button"; b.id = "step-" + i;
   b.innerHTML = `<span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span><span class="m ${s.method}">${s.method}</span>`;
   b.addEventListener("click", () => { stop(); show(i); });
   list.appendChild(b);
@@ -133,7 +133,7 @@ function show(i){
     ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
     <div class="block"><div class="bar"><span class="lbl">request</span><span class="m ${s.method}" style="color:#fff;padding:1px 6px;border-radius:4px">${s.method}</span><span>${esc(s.path)}</span></div>${s.body !== null ? `<pre>${hl(s.body)}</pre>` : `<div class="empty">no body</div>`}</div>
     <div class="block"><div class="bar"><span class="lbl">response</span><span class="status ${ok ? "" : "bad"}">${s.status}</span><span style="color:var(--muted)">${ok ? "application/json" : "validation error"}</span></div><pre>${hl(s.response)}</pre></div>
-    <div class="nav"><button type="button" id="prev" ${i===0?"disabled":""}>Previous</button><button type="button" id="next" class="primary" ${i===D.steps.length-1?"disabled":""}>Next step</button></div>`;
+    <div class="nav"><button type="button" id="prev" ${i===0?"disabled title=\"No previous step\"":""}>Previous</button><button type="button" id="next" class="primary" ${i===D.steps.length-1?"disabled title=\"No next step\"":""}>Next step</button></div>`;
   document.getElementById("prev").addEventListener("click", () => { stop(); show(i-1); });
   document.getElementById("next").addEventListener("click", () => { stop(); show(i+1); });
   const active = list.querySelector('[aria-current="step"]'); if (active) active.scrollIntoView({block:"nearest"});
