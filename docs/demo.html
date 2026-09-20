@@ -56,6 +56,7 @@ p{margin:0}
 .step{display:block;text-decoration:none;color:var(--ink-2);padding:8px 0 8px;border-top:2px solid var(--axis);font-size:12px}
 .step b{display:block;color:var(--ink);font-weight:600;font-size:13px}
 .step:hover{border-top-color:var(--accent)}
+.step:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
 
 /* sections */
@@ -113,6 +114,7 @@ tr.rej td{color:var(--ink-2)}
 .chart .ref{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:3 3}
 .chart .thr{stroke:var(--serious);stroke-width:1}
 .chart .thr2{stroke:var(--critical);stroke-width:1}
+.chart .hit:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 .tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--page);font-size:12px;padding:6px 9px;border-radius:6px;z-index:20;opacity:0;transition:opacity .08s;max-width:260px}
 .tip b{display:block;font-weight:600}
 .meter{height:8px;border-radius:4px;background:var(--seq-lo);overflow:hidden;margin-top:8px}
@@ -216,10 +218,10 @@ const tip = document.getElementById("tip");
 function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
 function moveTip(e){ const x = Math.min(e.clientX + 14, window.innerWidth - 270); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
 function hideTip(){ tip.style.opacity = 0; }
-function hover(el, html){ el.addEventListener("mouseenter", e => showTip(e, html)); el.addEventListener("mousemove", moveTip); el.addEventListener("mouseleave", hideTip); }
+function hover(el, html){ el.setAttribute("tabindex", "0"); el.setAttribute("aria-label", html.replace(/<[^>]*>?/gm, '')); el.addEventListener("mouseenter", e => showTip(e, html)); el.addEventListener("mousemove", moveTip); el.addEventListener("mouseleave", hideTip); el.addEventListener("focus", e => showTip({clientX: el.getBoundingClientRect().left + el.getBoundingClientRect().width/2, clientY: el.getBoundingClientRect().top + el.getBoundingClientRect().height/2}, html)); el.addEventListener("blur", hideTip); }
 const svgNS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, parent){ const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
-function chart(mount, w, h){ const m = document.getElementById(mount); m.innerHTML = ""; const s = el("svg", {viewBox:`0 0 ${w} ${h}`, class:"chart", role:"img"}); m.appendChild(s); return s; }
+function chart(mount, w, h){ const m = document.getElementById(mount); m.innerHTML = ""; const s = el("svg", {viewBox:`0 0 ${w} ${h}`, class:"chart", role:"group", "aria-label":"Chart"}); m.appendChild(s); return s; }
 function niceMax(v){ const p = Math.pow(10, Math.floor(Math.log10(v))); const f = v/p; const n = f <= 1 ? 1 : f <= 2 ? 2 : f <= 2.5 ? 2.5 : f <= 5 ? 5 : 10; return n*p; }
 function yGrid(s, x0, x1, y0, y1, max, ticks, fmtFn){ const g = el("g", {class:"grid"}, s); for (let i=0;i<=ticks;i++){ const v = max*i/ticks, y = y1 - (y1-y0)*i/ticks; if (i>0) el("line", {x1:x0, x2:x1, y1:y, y2:y}, g); el("text", {x:x0-6, y:y+4, "text-anchor":"end"}, s).textContent = fmtFn(v); } el("line", {x1:x0, x2:x1, y1:y1, y2:y1, class:"axis"}, s); }
 function barPath(x, y, w, h, r){ if (h <= r) return `M${x},${y+h} v${-h} h${w} v${h} z`; return `M${x},${y+h} v${-(h-r)} a${r},${r} 0 0 1 ${r},${-r} h${w-2*r} a${r},${r} 0 0 1 ${r},${r} v${h-r} z`; }
