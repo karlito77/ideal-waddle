@@ -109,7 +109,8 @@ tr.rej td{color:var(--ink-2)}
 .chart .grid line{stroke:var(--grid);stroke-width:1}
 .chart .axis{stroke:var(--axis);stroke-width:1}
 .chart .bar{rx:0}
-.chart .hit{fill:transparent}
+.chart .hit{fill:transparent;outline:none;cursor:pointer}
+.chart .hit:focus-visible{stroke:var(--accent);stroke-width:2;fill:var(--accent-wash)}
 .chart .ref{stroke:var(--ink-2);stroke-width:1;stroke-dasharray:3 3}
 .chart .thr{stroke:var(--serious);stroke-width:1}
 .chart .thr2{stroke:var(--critical);stroke-width:1}
@@ -216,7 +217,16 @@ const tip = document.getElementById("tip");
 function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
 function moveTip(e){ const x = Math.min(e.clientX + 14, window.innerWidth - 270); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
 function hideTip(){ tip.style.opacity = 0; }
-function hover(el, html){ el.addEventListener("mouseenter", e => showTip(e, html)); el.addEventListener("mousemove", moveTip); el.addEventListener("mouseleave", hideTip); }
+function hover(el, html){
+  el.setAttribute("tabindex", "0");
+  el.setAttribute("role", "graphics-symbol");
+  el.setAttribute("aria-label", html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+  el.addEventListener("mouseenter", e => showTip(e, html));
+  el.addEventListener("mousemove", moveTip);
+  el.addEventListener("mouseleave", hideTip);
+  el.addEventListener("focus", e => { const r = el.getBoundingClientRect(); showTip({clientX: r.left + r.width/2 - 14, clientY: r.top + r.height/2 - 14}, html); });
+  el.addEventListener("blur", hideTip);
+}
 const svgNS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, parent){ const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
 function chart(mount, w, h){ const m = document.getElementById(mount); m.innerHTML = ""; const s = el("svg", {viewBox:`0 0 ${w} ${h}`, class:"chart", role:"img"}); m.appendChild(s); return s; }
