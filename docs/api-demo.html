@@ -90,17 +90,17 @@ pre .k{color:var(--k)} pre .s{color:var(--s)} pre .n{color:var(--n)} pre .b{colo
   </div>
 
   <div class="layout">
-    <div class="card steplist" id="steps" role="list"></div>
+    <nav class="card steplist" id="steps" aria-label="API Steps"></nav>
     <div class="card main" id="main"></div>
   </div>
 
   <div class="card" style="margin-top:22px">
     <div class="tabs" role="tablist">
-      <button class="tab" role="tab" id="tab-demo" aria-selected="true" type="button">python scripts/demo.py</button>
-      <button class="tab" role="tab" id="tab-test" aria-selected="false" type="button">pytest -q</button>
-      <button class="tab" role="tab" id="tab-tree" aria-selected="false" type="button">package layout</button>
+      <button class="tab" role="tab" id="tab-demo" aria-selected="true" aria-controls="panel" type="button">python scripts/demo.py</button>
+      <button class="tab" role="tab" id="tab-test" aria-selected="false" aria-controls="panel" type="button">pytest -q</button>
+      <button class="tab" role="tab" id="tab-tree" aria-selected="false" aria-controls="panel" type="button">package layout</button>
     </div>
-    <div class="panel" id="panel"></div>
+    <div class="panel" id="panel" role="tabpanel" tabindex="0" aria-labelledby="tab-demo"></div>
   </div>
 </div>
 
@@ -118,7 +118,7 @@ function hl(obj){
 let cur = 0, done = new Set(), timer = null;
 const list = document.getElementById("steps"), main = document.getElementById("main");
 D.steps.forEach((s, i) => {
-  const b = document.createElement("button"); b.type = "button"; b.id = "step-" + i; b.setAttribute("role", "listitem");
+  const b = document.createElement("button"); b.type = "button"; b.id = "step-" + i;
   b.innerHTML = `<span class="n">${String(i+1).padStart(2,"0")}</span><span>${esc(s.title)}</span><span class="m ${s.method}">${s.method}</span>`;
   b.addEventListener("click", () => { stop(); show(i); });
   list.appendChild(b);
@@ -147,7 +147,7 @@ document.getElementById("run").addEventListener("click", () => {
 document.getElementById("reset").addEventListener("click", () => { stop(); done.clear(); show(0); });
 
 const panels = { "tab-demo": D.demo_out, "tab-test": D.test_out, "tab-tree": D.tree };
-function tab(id){ document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.id === id)); document.getElementById("panel").innerHTML = `<pre>${esc(panels[id])}</pre>`; }
+function tab(id){ document.querySelectorAll(".tab").forEach(t => t.setAttribute("aria-selected", t.id === id)); const panel = document.getElementById("panel"); panel.innerHTML = `<pre>${esc(panels[id])}</pre>`; panel.setAttribute("aria-labelledby", id); }
 document.querySelectorAll(".tab").forEach(t => t.addEventListener("click", () => tab(t.id)));
 tab("tab-demo");
 show(0);
