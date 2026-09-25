@@ -1,0 +1,3 @@
+## 2024-05-23 - Smooth Scrolling and Keyboard Focus for Internal Navigation
+**Learning:** The pipeline navigation links (`<a class="step" href="...">`) lacked keyboard focus indicators, making them inaccessible to keyboard users. Additionally, while `scroll-margin-top` was configured for the sticky header, the absence of `scroll-behavior: smooth` caused abrupt jumping, reducing spatial awareness of the document structure.
+**Action:** Always ensure internal anchor links are accompanied by smooth scrolling (respecting `prefers-reduced-motion`) and clear `:focus-visible` states to improve both accessibility and interaction polish.
