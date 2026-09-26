@@ -1,0 +1,3 @@
+## 2025-10-24 - Keyboard accessibility for interactive SVG chart tooltips
+**Learning:** SVG chart elements often lack native semantic meaning and focusability. Simply relying on mouse hover events for tooltips excludes keyboard users. Tooltips in custom SVGs require manual focus management (`tabindex="0"`, focus/blur events), semantic roles (`role="graphics-symbol"`), explicit text descriptions (`aria-label`), and an `Escape` key dismissal mechanism to meet basic accessibility standards.
+**Action:** When adding interactive charts using raw SVGs, ensure hover interactions are replicated for keyboard users. Add `tabindex`, a role, programmatic ARIA text, and keyboard listeners to show/hide tooltips consistently across input methods.
