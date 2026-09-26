@@ -123,6 +123,7 @@ tr.rej td{color:var(--ink-2)}
 .reasons{margin:0;padding-left:18px;color:var(--ink-2)}
 .reasons li{margin-bottom:4px}
 .foot{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px;max-width:80ch}
+.hit:focus-visible{outline:2px solid var(--accent);outline-offset:1px;border-radius:2px}
 @media (prefers-reduced-motion:reduce){.tip{transition:none}}
 </style>
 </head>
@@ -216,7 +217,17 @@ const tip = document.getElementById("tip");
 function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
 function moveTip(e){ const x = Math.min(e.clientX + 14, window.innerWidth - 270); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
 function hideTip(){ tip.style.opacity = 0; }
-function hover(el, html){ el.addEventListener("mouseenter", e => showTip(e, html)); el.addEventListener("mousemove", moveTip); el.addEventListener("mouseleave", hideTip); }
+function hover(el, html){
+  el.setAttribute("tabindex", "0");
+  el.setAttribute("role", "graphics-symbol");
+  el.setAttribute("aria-label", html.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ").trim());
+  el.addEventListener("mouseenter", e => showTip(e, html));
+  el.addEventListener("mousemove", moveTip);
+  el.addEventListener("mouseleave", hideTip);
+  el.addEventListener("focus", () => { const r = el.getBoundingClientRect(); tip.innerHTML = html; tip.style.opacity = 1; tip.style.left = Math.min(r.left + r.width/2, window.innerWidth - 270) + "px"; tip.style.top = Math.max(r.top - 36, 10) + "px"; });
+  el.addEventListener("blur", hideTip);
+  el.addEventListener("keydown", e => { if(e.key==="Escape") el.blur(); });
+}
 const svgNS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, parent){ const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
 function chart(mount, w, h){ const m = document.getElementById(mount); m.innerHTML = ""; const s = el("svg", {viewBox:`0 0 ${w} ${h}`, class:"chart", role:"img"}); m.appendChild(s); return s; }
