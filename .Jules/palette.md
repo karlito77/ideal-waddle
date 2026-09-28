@@ -1,0 +1,3 @@
+## 2025-10-24 - Keyboard Shortcuts in Step-through UI
+**Learning:** Adding keyboard shortcuts (left/right arrows) for step-through interfaces like api-demo significantly reduces user friction compared to clicking buttons. Explicitly documenting these shortcuts in UI tooltips improves discoverability.
+**Action:** Always add keyboard shortcuts for paginated or step-based components to enhance accessibility and power-user speed.
