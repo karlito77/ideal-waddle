@@ -1,0 +1,3 @@
+## 2025-02-28 - Focus Loss on DOM Replacement
+**Learning:** When using vanilla JS to replace large chunks of HTML via `innerHTML` (e.g., in a rendering function), any active element inside that chunk is destroyed. This silently resets keyboard focus to the `<body>` element, breaking tab order and keyboard navigation for screen reader and keyboard-only users.
+**Action:** When replacing DOM nodes that might currently have focus (like pagination buttons), always check `document.activeElement.id` before the replacement, and explicitly call `.focus()` on the newly recreated element after it is appended to the DOM.

@@ -128,6 +128,7 @@ function show(i){
   const s = D.steps[i];
   list.querySelectorAll("button").forEach((b, j) => { b.toggleAttribute("aria-current", j === i); if (j === i) b.setAttribute("aria-current", "step"); b.classList.toggle("done", done.has(j)); });
   const ok = s.status < 400;
+  const activeId = document.activeElement ? document.activeElement.id : null;
   main.innerHTML = `
     <div class="title"><span class="n">step ${i+1} of ${D.steps.length}</span><h2>${esc(s.title)}</h2></div>
     ${s.note ? `<p class="note">${esc(s.note)}</p>` : ""}
@@ -136,6 +137,7 @@ function show(i){
     <div class="nav"><button type="button" id="prev" ${i===0?"disabled":""}>Previous</button><button type="button" id="next" class="primary" ${i===D.steps.length-1?"disabled":""}>Next step</button></div>`;
   document.getElementById("prev").addEventListener("click", () => { stop(); show(i-1); });
   document.getElementById("next").addEventListener("click", () => { stop(); show(i+1); });
+  if (activeId === "prev" || activeId === "next") { const btn = document.getElementById(activeId); if (btn && !btn.disabled) btn.focus(); }
   const active = list.querySelector('[aria-current="step"]'); if (active) active.scrollIntoView({block:"nearest"});
 }
 function stop(){ if (timer) { clearInterval(timer); timer = null; document.getElementById("run").textContent = "Run all steps"; } }
