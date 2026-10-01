@@ -1,0 +1,3 @@
+## 2025-10-01 - ARIA Role Overrides on Interactive Elements
+**Learning:** In the API Demo step list, the native interactive `<button>` elements were being incorrectly assigned `role="listitem"` in JavaScript to fit visually into a `<div role="list">`. This override strips the button semantics for screen readers, effectively hiding its interactivity and replacing it with a static list item role.
+**Action:** Always maintain the interactive semantics of elements like `<button>`. If a group of interactive elements needs to be presented together without list semantics, use a container with `role="group"` (and an appropriate `aria-label`) rather than overriding the roles of the buttons themselves.
