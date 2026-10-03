@@ -56,6 +56,7 @@ p{margin:0}
 .step{display:block;text-decoration:none;color:var(--ink-2);padding:8px 0 8px;border-top:2px solid var(--axis);font-size:12px}
 .step b{display:block;color:var(--ink);font-weight:600;font-size:13px}
 .step:hover{border-top-color:var(--accent)}
+.step:focus-visible{outline:2px solid var(--accent);outline-offset:2px;border-radius:2px}
 @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
 
 /* sections */
@@ -124,13 +125,14 @@ tr.rej td{color:var(--ink-2)}
 .reasons li{margin-bottom:4px}
 .foot{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px;max-width:80ch}
 @media (prefers-reduced-motion:reduce){.tip{transition:none}}
+@media (prefers-reduced-motion:no-preference){html{scroll-behavior:smooth}}
 </style>
 </head>
 <body>
 
 <div class="top"><div class="wrap top-in">
   <div class="brand">
-    <div class="mark"><svg viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M2 12 L6 7 L9 10 L14 3"/><path d="M2 14h12"/></svg></div>
+    <div class="mark"><svg aria-hidden="true" viewBox="0 0 16 16" fill="none" stroke="#fff" stroke-width="1.6" stroke-linecap="round"><path d="M2 12 L6 7 L9 10 L14 3"/><path d="M2 14h12"/></svg></div>
     <div><h1>Risk Intelligence Platform</h1><small>Community demo · Logistics &amp; Warehousing</small></div>
   </div>
   <div class="seg" role="group" aria-label="Viewing as client" id="client-seg"></div>
