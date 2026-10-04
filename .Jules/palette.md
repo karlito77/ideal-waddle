@@ -1,0 +1,3 @@
+## 2025-02-27 - [Interactive SVG Elements Need Keyboard Access]
+**Learning:** Interactive SVG elements (like chart bars or dots) using simple mouse event listeners (`mouseenter`, `mousemove`, `mouseleave`) are completely inaccessible to keyboard and screen-reader users, as they cannot receive focus.
+**Action:** When implementing custom interactive SVG elements with tooltips, always add `tabindex="0"`, handle `focus` and `blur` events to position/show/hide the tooltips, and add a CSS `:focus-visible` outline so users know where their keyboard focus is. Using `role="status"` and `aria-live="polite"` on the tooltip container ensures the content is read to screen readers.
