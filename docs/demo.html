@@ -49,7 +49,7 @@ p{margin:0}
 .seg{display:flex;gap:2px;background:var(--card-2);border:1px solid var(--line);border-radius:8px;padding:2px;margin-left:auto}
 .seg button{border:0;background:transparent;color:var(--ink-2);font:500 13px var(--sans);padding:6px 12px;border-radius:6px;cursor:pointer}
 .seg button[aria-pressed="true"]{background:var(--card);color:var(--ink);box-shadow:0 1px 2px rgba(0,0,0,.08)}
-.seg button:focus-visible,.tab:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
+.seg button:focus-visible,.tab:focus-visible,.hit:focus-visible{outline:2px solid var(--accent);outline-offset:1px}
 
 /* stepper */
 .steps{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-bottom:28px}
@@ -216,7 +216,19 @@ const tip = document.getElementById("tip");
 function showTip(e, html){ tip.innerHTML = html; tip.style.opacity = 1; moveTip(e); }
 function moveTip(e){ const x = Math.min(e.clientX + 14, window.innerWidth - 270); tip.style.left = x + "px"; tip.style.top = (e.clientY + 14) + "px"; }
 function hideTip(){ tip.style.opacity = 0; }
-function hover(el, html){ el.addEventListener("mouseenter", e => showTip(e, html)); el.addEventListener("mousemove", moveTip); el.addEventListener("mouseleave", hideTip); }
+function hover(el, html){
+  el.setAttribute("tabindex", "0");
+  el.addEventListener("mouseenter", e => showTip(e, html));
+  el.addEventListener("mousemove", moveTip);
+  el.addEventListener("mouseleave", hideTip);
+  el.addEventListener("focus", () => {
+    tip.innerHTML = html; tip.style.opacity = 1;
+    const r = el.getBoundingClientRect();
+    tip.style.left = Math.min(r.left + r.width/2 + 14, window.innerWidth - 270) + "px";
+    tip.style.top = (r.top + r.height/2 + 14) + "px";
+  });
+  el.addEventListener("blur", hideTip);
+}
 const svgNS = "http://www.w3.org/2000/svg";
 function el(tag, attrs, parent){ const n = document.createElementNS(svgNS, tag); for (const k in attrs) n.setAttribute(k, attrs[k]); if (parent) parent.appendChild(n); return n; }
 function chart(mount, w, h){ const m = document.getElementById(mount); m.innerHTML = ""; const s = el("svg", {viewBox:`0 0 ${w} ${h}`, class:"chart", role:"img"}); m.appendChild(s); return s; }
