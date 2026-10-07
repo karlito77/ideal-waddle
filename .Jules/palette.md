@@ -1,0 +1,3 @@
+## 2025-02-23 - Smooth Scrolling for Navigation Links
+**Learning:** When adding `scroll-behavior: smooth` to improve navigation UX on pages with sticky headers, it's essential to combine it with `scroll-margin-top` on the target sections to prevent the header from obscuring the content. Furthermore, always override it with `html { scroll-behavior: auto; }` within a `@media (prefers-reduced-motion: reduce)` block to ensure accessibility for users who experience motion sickness or vestibular disorders.
+**Action:** Always include a `prefers-reduced-motion` check when implementing scroll animations, and verify anchor target visibility when sticky headers are present.
