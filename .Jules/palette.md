@@ -1,0 +1,4 @@
+
+## 2025-02-13 - Smooth Scrolling with Sticky Headers
+**Learning:** Adding smooth scrolling (`html { scroll-behavior: smooth }`) to anchor links creates a much more pleasant navigation experience. When a page has a sticky header, ensuring that target sections have `scroll-margin-top` set correctly (e.g., `scroll-margin-top: 72px`) prevents the content from being hidden underneath the header. Additionally, an accessibility override `html { scroll-behavior: auto }` must be included within a `@media (prefers-reduced-motion: reduce)` block to support users who have disabled animations.
+**Action:** Always check for sticky headers when implementing smooth scrolling and ensure `scroll-margin-top` is utilized correctly. Always include the `prefers-reduced-motion` override for accessibility compliance.
