@@ -29,6 +29,8 @@
   --grid:#2a3037; --axis:#3a424b; --line:rgba(255,255,255,.10); --accent:#5598e7; --accent-wash:rgba(85,152,231,.12);
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --seq-lo:#184f95; --good-text:#0ca30c;
 }
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 *{box-sizing:border-box}
 body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding-block:0 48px;padding-inline:16px}
