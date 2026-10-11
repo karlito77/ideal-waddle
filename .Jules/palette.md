@@ -1,0 +1,3 @@
+## 2026-10-11 - [Implement Smooth Scrolling with Sticky Headers]
+**Learning:** When adding smooth scrolling (`scroll-behavior: smooth`) to a page with a sticky header and anchor links, it perfectly complements `scroll-margin-top` on target sections to ensure the scrolled content isn't hidden behind the header. Furthermore, it is critical to include a `prefers-reduced-motion: reduce` media query that overrides it with `scroll-behavior: auto` to respect users' accessibility settings.
+**Action:** Pair `scroll-behavior: smooth` with `scroll-margin-top` on target sections when sticky headers are present. Always include a `prefers-reduced-motion: reduce` override.
