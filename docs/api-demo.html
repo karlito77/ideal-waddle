@@ -28,6 +28,8 @@
   --line:rgba(255,255,255,.10); --accent:#5598e7; --accent-wash:rgba(85,152,231,.12); --get:#3987e5; --post:#199e70;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
 body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding-block:20px 48px;padding-inline:16px}
 h1,h2,h3{margin:0;font-weight:600;text-wrap:balance}
