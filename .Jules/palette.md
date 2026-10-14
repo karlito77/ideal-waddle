@@ -1,0 +1,3 @@
+## 2025-12-01 - Accessible smooth scrolling for sticky headers
+**Learning:** When implementing smooth scrolling for anchor links to sections below a sticky header, setting `scroll-behavior: smooth` on `html` must be paired with `scroll-margin-top` on the target sections to prevent the header from occluding the content. Furthermore, a `prefers-reduced-motion: reduce` media query that resets `scroll-behavior: auto` is required for accessibility to support users with vestibular disorders.
+**Action:** Always include both the layout adjustment (`scroll-margin-top`) and the accessibility override (`prefers-reduced-motion`) when adding smooth scrolling to long pages.
