@@ -1,0 +1,4 @@
+## 2025-02-12 - Added Smooth Scrolling with Sticky Headers
+
+**Learning:** When adding `scroll-behavior: smooth` to a document, anchor links may scroll underneath sticky headers, hiding content. A critical UX insight is to pair this smooth scrolling functionality with `scroll-margin-top` on the targeted elements to offset the header's height. Additionally, always include a `prefers-reduced-motion: reduce` override setting `scroll-behavior: auto` to prevent triggering nausea or disorientation for users with vestibular disorders.
+**Action:** When implementing anchor-based smooth scrolling on pages featuring sticky/fixed top navigation bars, ensure target sections utilize `scroll-margin-top` to account for the header's dimensions, and wrap motion resets in a `prefers-reduced-motion` media query.
