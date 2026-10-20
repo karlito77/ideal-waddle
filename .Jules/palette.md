@@ -1,0 +1,3 @@
+## 2024-10-20 - Anchor Scroll Alignment with Sticky Headers
+**Learning:** Adding smooth scrolling to a page with a sticky header breaks scroll positioning unless the scroll target has sufficient top padding. The intersection margin calculation does not automatically adjust to account for fixed/sticky headers overlapping the viewport.
+**Action:** Always combine `scroll-behavior: smooth` with `scroll-margin-top` on anchor targets. Use media queries to adjust `scroll-margin-top` values if the sticky header height varies across breakpoints, and ensure a fallback `prefers-reduced-motion` to `auto` is set for accessibility.
