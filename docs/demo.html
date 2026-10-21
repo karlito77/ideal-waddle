@@ -58,8 +58,12 @@ p{margin:0}
 .step:hover{border-top-color:var(--accent)}
 @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
 
+html{scroll-behavior:smooth}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
 /* sections */
-section{margin-bottom:36px;scroll-margin-top:72px}
+section{margin-bottom:36px;scroll-margin-top:140px}
+@media (max-width:640px){section{scroll-margin-top:180px}}
 .sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:12px}
 .sec-head p{color:var(--ink-2);max-width:68ch}
 .grid{display:grid;gap:14px}
