@@ -30,6 +30,7 @@
   --s1:#3987e5; --s2:#d95926; --s3:#199e70; --seq-lo:#184f95; --good-text:#0ca30c;
 }
 *{box-sizing:border-box}
+html{scroll-behavior:smooth}
 body{margin:0;background:var(--page);color:var(--ink);font:14px/1.5 var(--sans);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding-block:0 48px;padding-inline:16px}
 h1,h2,h3{margin:0;text-wrap:balance;font-weight:600}
@@ -59,7 +60,7 @@ p{margin:0}
 @media (max-width:640px){.steps{grid-template-columns:repeat(3,1fr)}}
 
 /* sections */
-section{margin-bottom:36px;scroll-margin-top:72px}
+section{margin-bottom:36px;scroll-margin-top:180px}
 .sec-head{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px 14px;margin-bottom:12px}
 .sec-head p{color:var(--ink-2);max-width:68ch}
 .grid{display:grid;gap:14px}
@@ -123,7 +124,7 @@ tr.rej td{color:var(--ink-2)}
 .reasons{margin:0;padding-left:18px;color:var(--ink-2)}
 .reasons li{margin-bottom:4px}
 .foot{color:var(--muted);font-size:12px;border-top:1px solid var(--line);padding-top:14px;max-width:80ch}
-@media (prefers-reduced-motion:reduce){.tip{transition:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto} .tip{transition:none}}
 </style>
 </head>
 <body>
