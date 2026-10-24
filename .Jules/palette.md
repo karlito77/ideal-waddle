@@ -1,0 +1,3 @@
+## 2024-05-18 - Sticky Headers and Smooth Scrolling
+**Learning:** When using sticky headers, `scroll-margin-top` must account for the actual computed height of the sticky element to prevent content from being obscured when jumping to anchor links. Additionally, smooth scrolling (`scroll-behavior: smooth`) improves navigation UX but must always be paired with a `prefers-reduced-motion: reduce` override to ensure accessibility for users sensitive to motion.
+**Action:** Always verify sticky header computed height and ensure smooth scrolling implementations include a reduced-motion media query override.
