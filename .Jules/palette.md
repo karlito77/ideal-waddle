@@ -1,0 +1,3 @@
+## 2025-03-05 - Smooth Scrolling with Sticky Headers
+**Learning:** When implementing smooth scrolling (`html { scroll-behavior: smooth }`) to anchor links on pages with a sticky header, verify the computed height of the header. Ensure `scroll-margin-top` on target sections is large enough to prevent the sticky header from obscuring the content. Always include a `@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }` media query override to ensure accessibility.
+**Action:** Use `scroll-margin-top` along with `scroll-behavior` for targeted sections when a sticky header is present, and always provide a reduced-motion fallback.
