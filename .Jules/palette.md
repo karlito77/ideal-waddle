@@ -1,0 +1,3 @@
+## 2026-11-06 - Sticky Header Scroll Offset
+**Learning:** When using anchor links with a sticky header, `scroll-margin-top` must be large enough to account for the header's maximum height across all viewports (e.g. when elements wrap on mobile). Additionally, pairing it with `scroll-behavior: smooth` improves the navigation UX, provided a `prefers-reduced-motion` override is included for accessibility.
+**Action:** Use Playwright's `getBoundingClientRect().height` on various viewports to find the maximum sticky header height, then set `scroll-margin-top` slightly larger than that max value, along with smooth scroll behaviors.
